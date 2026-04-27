@@ -1282,9 +1282,25 @@ dependencies = [
 
 [[package]]
 name = "jupyter-protocol"
-version = "1.0.0"
+version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d59805f0675efc81c70fe198b516c64062d52deb93a9f0562509670a99f011a"
+checksum = "2ebf93748a4d7fff4b475da4f50d95b1ea6cf9ed528ed5ec26db8228eabc112a"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "chrono",
+ "futures",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.17",
+ "uuid",
+]
+
+[[package]]
+name = "jupyter-protocol"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "67c8c5887974082be34e2bdac6b9b9dd8ad89951cae918b197959035b0673f6f"
 dependencies = [
  "async-trait",
  "bytes",
@@ -1495,7 +1511,7 @@ checksum = "5903b59b1e05b1dda851281e3668ad3b6b32b1d6677d591563bc2091474d7d3c"
 dependencies = [
  "anyhow",
  "chrono",
- "jupyter-protocol",
+ "jupyter-protocol 1.5.0",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
@@ -2400,7 +2416,7 @@ dependencies = [
  "dialoguer",
  "edit-distance",
  "flate2",
- "jupyter-protocol",
+ "jupyter-protocol 2.0.0",
  "lazy-regex",
  "nbformat",
  "pretty_assertions",
