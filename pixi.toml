@@ -6,14 +6,16 @@ platforms = ["win-64", "linux-64"]
 version   = "0.1.0"
 
 [tasks]
-test     = "cargo test --all"
-cov-ci   = "cargo llvm-cov --locked --all-features --lcov --output-path lcov.info"
-cov-open = "cargo llvm-cov --locked --all-features --open"
+test       = "cargo test --all"
+test-clean = { depends-on = ["clean", "test"] }
+cov-ci     = "cargo llvm-cov --locked --all-features --lcov --output-path lcov.info"
+cov-open   = "cargo llvm-cov --locked --all-features --open"
 
 
 [dependencies]
 rust           = ">=1.92.0,<1.93"
 cargo-llvm-cov = ">=0.6.23,<0.7"
+gcc            = ">=15.2.0,<15.3"
 
 [feature.docs.dependencies]
 mdbook = ">=0.5.2,<0.6"
@@ -98,6 +100,12 @@ pr = { depends-on = [
   "git-check-clean-worktree",
   "gh-create-pr",
 ] }
+
+
+clean-cargo = "pixi run cargo clean"
+clean-pixi  = "pixi clean"
+
+clean = { depends-on = ["clean-cargo", "clean-pixi"] }
 
 [environments]
 default = { features = ["default", "dev", "zola", "docs"] }
