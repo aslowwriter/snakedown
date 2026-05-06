@@ -19,6 +19,6 @@ Currently snakedown only dumps the content and doesn't do much pre-processing, h
 
 Because the output of snakedown is just content that get's added to an existing site, and we don't yet produce shortcodes, you can currently use snakedown with any theme. However, the following themes are made to work with the output of snakedown with minimal configuration and should be kept up to date with new snakedown features.
 
-- [Snakedown](https://github.com/savente93/zola-snakedown-theme) The default snakedown theme for Zola, developed by the Snakedown devs. Based on the PyData Sphinx Theme.
+- [Snakedown](https://github.com/aslowwriter/zola-snakedown-theme) The default snakedown theme for Zola, developed by the Snakedown devs. Based on the PyData Sphinx Theme.
 
 Other compatible themes may be added here. If you know of one, please submit a PR to add it to this list!

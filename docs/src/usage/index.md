@@ -1,6 +1,6 @@
 # Getting Started
 
-As an example we will go through how to setup a docs site with snakedown using [zola](https://www.getzola.org/documentation/getting-started/installation/) and the [snakedown theme](https://github.com/savente93/zola-snakedown-theme). In addition to snakedown being installed (see [installing](installation.md))
+As an example we will go through how to setup a docs site with snakedown using [zola](https://www.getzola.org/documentation/getting-started/installation/) and the [snakedown theme](https://github.com/aslowwriter/zola-snakedown-theme). In addition to snakedown being installed (see [installing](installation.md))
 
 to follow along with this example you'll also need `zola` and `git` installed. These are not strictly required to use snakedown as you can use it without them
 but it is the easiest way.
@@ -86,7 +86,7 @@ pkg
 From the root of your zola site (the `docs` folder) add the snakedown theme to your site:
 
 ```bash
-git clone https://github.com/savente93/zola-snakedown-theme.git themes/snakedown
+git clone https://github.com/aslowwriter/zola-snakedown-theme.git themes/snakedown
 ```
 
 Also make sure to enable the theme in zola's `config.toml` by adding the following line:

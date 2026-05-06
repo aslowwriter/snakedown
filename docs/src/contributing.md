@@ -111,16 +111,16 @@ Also keep in mind not all our rules have to be met at every single stage. It is 
 
 #### My unit tests are passing but the integration test is failing, what's going on?
 
-Make sure that you've initialized the git submodules. We use submodules to include the supported themes for the SSGs in our repo. If you've already cloned the repo, you can do so by executing the command `git submodule update --recursive --init`. If you haven't you can make sure this is done correctly by cloning with the `--recursive` option like so: `git clone --recursive https://github.com/savente93/snakedown`
+Make sure that you've initialized the git submodules. We use submodules to include the supported themes for the SSGs in our repo. If you've already cloned the repo, you can do so by executing the command `git submodule update --recursive --init`. If you haven't you can make sure this is done correctly by cloning with the `--recursive` option like so: `git clone --recursive https://github.com/aslowwriter/snakedown`
 
 ##  Publishing
 
 For this project we have a [`release-plz`](https://release-plz.dev/docs) action setup. This gets updated automatically, and to release to all the places we distribute too all you have to do is edit and merge that release PR.
 
-[issues]: https://github.com/savente93/snakedown/issues
-[new issue]: https://github.com/savente93/snakedown/issues/new
-[good first issue]: https://github.com/savente93/snakedown/issues?q=state%3Aopen%20label%3A%22good%20first%20issue%22
-[mentoring available]: https://github.com/savente93/snakedown/issues?q=state%3Aopen%20label%3Amentoring-available
+[issues]: https://github.com/aslowwriter/snakedown/issues
+[new issue]: https://github.com/aslowwriter/snakedown/issues/new
+[good first issue]: https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3A%22good%20first%20issue%22
+[mentoring available]: https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3Amentoring-available
 
 ## Acknolwegements
 - thank you to [Ed Page](https://github.com/epage). These guidelines were adapted from [this](https://github.com/epage/_rust) template which he wrote.

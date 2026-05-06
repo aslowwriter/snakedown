@@ -1,7 +1,7 @@
 # SnakeDown 🐍🕵️‍♂️
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![codecov](https://codecov.io/gh/savente93/SnakeDown/branch/main/graph/badge.svg)](https://codecov.io/gh/savente93/SnakeDown)
+[![codecov](https://codecov.io/gh/aslowwriter/SnakeDown/branch/main/graph/badge.svg)](https://codecov.io/gh/aslowwriter/SnakeDown)
 [![crates.io](https://img.shields.io/crates/v/snakedown)](https://crates.io/crates/snakedown)
 [![Docs.rs](https://docs.rs/snakedown/badge.svg)](https://docs.rs/snakedown)
 [![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
@@ -102,4 +102,4 @@ Not yet, but I suspect they will.
 
 ## Template
 
-This repo was initially setup using [`cargo-generate`](https://github.com/cargo-generate/cargo-generate) and [this template](https://github.com/savente93/rust-template)
+This repo was initially setup using [`cargo-generate`](https://github.com/cargo-generate/cargo-generate) and [this template](https://github.com/aslowwriter/rust-template)

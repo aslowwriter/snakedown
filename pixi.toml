@@ -1,5 +1,5 @@
 [workspace]
-authors   = ["Sam Vente <savente93@proton.me>"]
+authors   = ["aslowwriter"]
 channels  = ["conda-forge"]
 name      = "snakedown"
 platforms = ["win-64", "linux-64"]
