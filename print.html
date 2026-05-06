@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-767a5e80.js";
+            window.path_to_searchindex_js = "searchindex-70e95c18.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-6f6e8175.js"></script>
@@ -189,7 +189,7 @@
 <ul>
 <li><a href="https://getzola.org">Zola</a>
 <ul>
-<li><a href="https://github.com/savente93/zola-snakedown-theme">snakedown</a></li>
+<li><a href="https://github.com/aslowwriter/zola-snakedown-theme">snakedown</a></li>
 </ul>
 </li>
 </ul>
@@ -201,11 +201,11 @@
 </code></pre>
 <p>This will install the latest released version.</p>
 <p>If you want to install the latest dev version you can also do that:</p>
-<pre><code class="language-bash">cargo install --git https://github.com/savente93/snakedown --branch main --locked
+<pre><code class="language-bash">cargo install --git https://github.com/aslowwriter/snakedown --branch main --locked
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
-<p>As an example we will go through how to setup a docs site with snakedown using <a href="https://www.getzola.org/documentation/getting-started/installation/">zola</a> and the <a href="https://github.com/savente93/zola-snakedown-theme">snakedown theme</a>. In addition to snakedown being installed (see <a href="usage/installation.html">installing</a>)</p>
+<p>As an example we will go through how to setup a docs site with snakedown using <a href="https://www.getzola.org/documentation/getting-started/installation/">zola</a> and the <a href="https://github.com/aslowwriter/zola-snakedown-theme">snakedown theme</a>. In addition to snakedown being installed (see <a href="usage/installation.html">installing</a>)</p>
 <p>to follow along with this example you’ll also need <code>zola</code> and <code>git</code> installed. These are not strictly required to use snakedown as you can use it without them
 but it is the easiest way.</p>
 <p>Finally you’ll also need a python package. For the purposes of this tutorial we will use the following file:</p>
@@ -263,7 +263,7 @@ pkg
     └── __init__.py
 </code></pre>
 <p>From the root of your zola site (the <code>docs</code> folder) add the snakedown theme to your site:</p>
-<pre><code class="language-bash">git clone https://github.com/savente93/zola-snakedown-theme.git themes/snakedown
+<pre><code class="language-bash">git clone https://github.com/aslowwriter/zola-snakedown-theme.git themes/snakedown
 </code></pre>
 <p>Also make sure to enable the theme in zola’s <code>config.toml</code> by adding the following line:</p>
 <pre><code class="language-toml">theme = "snakedown"
@@ -352,7 +352,7 @@ ssg = "Zola"
 <h3 id="supported-themes"><a class="header" href="#supported-themes">Supported themes</a></h3>
 <p>Because the output of snakedown is just content that get’s added to an existing site, and we don’t yet produce shortcodes, you can currently use snakedown with any theme. However, the following themes are made to work with the output of snakedown with minimal configuration and should be kept up to date with new snakedown features.</p>
 <ul>
-<li><a href="https://github.com/savente93/zola-snakedown-theme">Snakedown</a> The default snakedown theme for Zola, developed by the Snakedown devs. Based on the PyData Sphinx Theme.</li>
+<li><a href="https://github.com/aslowwriter/zola-snakedown-theme">Snakedown</a> The default snakedown theme for Zola, developed by the Snakedown devs. Based on the PyData Sphinx Theme.</li>
 </ul>
 <p>Other compatible themes may be added here. If you know of one, please submit a PR to add it to this list!</p>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -372,7 +372,7 @@ the cli.</p>
 <h2 id="formats"><a class="header" href="#formats">Formats</a></h2>
 <h3 id="snakedowntoml"><a class="header" href="#snakedowntoml">snakedown.toml</a></h3>
 <p>This is a toml file with configuration options that snakedown will use. It can be located either in the current working directory or in <code>$HOME/.config/snakedown/snakedown.toml</code></p>
-<p>And example file filled with all the defaults can be found <a href="https://github.com/savente93/snakedown/blob/main/snakedown.example.toml">here</a></p>
+<p>And example file filled with all the defaults can be found <a href="https://github.com/aslowwriter/snakedown/blob/main/snakedown.example.toml">here</a></p>
 <p>The possible values are documented below.</p>
 <h3 id="pyprojecttoml"><a class="header" href="#pyprojecttoml">pyproject.toml</a></h3>
 <p>This one will only be found if it is in the current working directory. It has the same options and behavior as <code>snakedown.toml</code> but the tables should be prefixed with <code>tool.snakedown</code> like so:</p>
@@ -437,25 +437,25 @@ if the issue, request or contribution is to do with the theme, please report tha
 specific repository.</p>
 <h2 id="feature-requests"><a class="header" href="#feature-requests">Feature Requests</a></h2>
 <p>Need some new functionality? You can let us know by opening an
-<a href="https://github.com/savente93/snakedown/issues/new">issue</a>. Please include a good description of what you would like
+<a href="https://github.com/aslowwriter/snakedown/issues/new">issue</a>. Please include a good description of what you would like
 and what you are hoping to accomplish with it. If you have considered alternatives
 or current work arounds it is often also helpful to describe those.</p>
 <p>In general if your feature request is well written and complete it vastly increaces the chances it will be picked up soon. In general we don’t ask for information for no reason, so if you omit things that may slow things down.</p>
 <h2 id="bug-reports"><a class="header" href="#bug-reports">Bug Reports</a></h2>
 <p>Please let us know about what problems you run into, whether in behavior or
-ergonomics of API. You can do this by opening an <a href="https://github.com/savente93/snakedown/issues/new">issue</a>.</p>
+ergonomics of API. You can do this by opening an <a href="https://github.com/aslowwriter/snakedown/issues/new">issue</a>.</p>
 <p>When you do so please include the version you were using as well good descriptions
 of what you were doing that may have triggered the error and what
 you expect to happen instead (unless it is trivial for example when you are reporting a crash)</p>
 <p>In general if your bug report is well written and complete it vastly increaces the chances it will be picked up soon. In general we don’t ask for information for no reason, so if you omit things that may slow things down.</p>
 <h2 id="pull-requests"><a class="header" href="#pull-requests">Pull Requests</a></h2>
-<p>Looking for an idea? Check our <a href="https://github.com/savente93/snakedown/issues">issues</a>. If the issue looks open ended,
+<p>Looking for an idea? Check our <a href="https://github.com/aslowwriter/snakedown/issues">issues</a>. If the issue looks open ended,
 it is probably best to post on the issue how you are thinking of resolving the
 issue so you can get feedback early in the process. We want you to be
 successful and it can be discouraging to find out a lot of re-work is needed.
 We encourage you to reach out and ask questions early in the process if you are uncertain.</p>
-<p>Don’t know where to start? check out the issues labeled <a href="https://github.com/savente93/snakedown/issues?q=state%3Aopen%20label%3A%22good%20first%20issue%22">good first issue</a> and <a href="https://github.com/savente93/snakedown/issues?q=state%3Aopen%20label%3Amentoring-available">mentoring available</a>. In general these are beginner friendly with more detailed instructions.</p>
-<p>Already have an idea?  It might be good to first <a href="https://github.com/savente93/snakedown/issues/new">create an issue</a>
+<p>Don’t know where to start? check out the issues labeled <a href="https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3A%22good%20first%20issue%22">good first issue</a> and <a href="https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3Amentoring-available">mentoring available</a>. In general these are beginner friendly with more detailed instructions.</p>
+<p>Already have an idea?  It might be good to first <a href="https://github.com/aslowwriter/snakedown/issues/new">create an issue</a>
 to propose it so we can make sure we are aligned and lower the risk of having
 to re-work some of it and the discouragement that goes along with that.</p>
 <h3 id="process"><a class="header" href="#process">Process</a></h3>
@@ -523,7 +523,7 @@ feel free to ask us for help! We might even suggest where it would work to be la
 <p>Also keep in mind not all our rules have to be met at every single stage. It is totally allowed to iterate/prototype until you are happy with things, and then clean up after!</p>
 <h3 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h3>
 <h4 id="my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on"><a class="header" href="#my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on">My unit tests are passing but the integration test is failing, what’s going on?</a></h4>
-<p>Make sure that you’ve initialized the git submodules. We use submodules to include the supported themes for the SSGs in our repo. If you’ve already cloned the repo, you can do so by executing the command <code>git submodule update --recursive --init</code>. If you haven’t you can make sure this is done correctly by cloning with the <code>--recursive</code> option like so: <code>git clone --recursive https://github.com/savente93/snakedown</code></p>
+<p>Make sure that you’ve initialized the git submodules. We use submodules to include the supported themes for the SSGs in our repo. If you’ve already cloned the repo, you can do so by executing the command <code>git submodule update --recursive --init</code>. If you haven’t you can make sure this is done correctly by cloning with the <code>--recursive</code> option like so: <code>git clone --recursive https://github.com/aslowwriter/snakedown</code></p>
 <h2 id="publishing"><a class="header" href="#publishing">Publishing</a></h2>
 <p>For this project we have a <a href="https://release-plz.dev/docs"><code>release-plz</code></a> action setup. This gets updated automatically, and to release to all the places we distribute too all you have to do is edit and merge that release PR.</p>
 <h2 id="acknolwegements"><a class="header" href="#acknolwegements">Acknolwegements</a></h2>
