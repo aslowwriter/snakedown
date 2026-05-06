@@ -13,4 +13,4 @@ Features include:
 It currently supports the following static site generators and themes:
 
 - [Zola](https://getzola.org)
-    - [snakedown](https://github.com/savente93/zola-snakedown-theme)
+    - [snakedown](https://github.com/aslowwriter/zola-snakedown-theme)

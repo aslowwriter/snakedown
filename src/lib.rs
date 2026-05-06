@@ -63,7 +63,7 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
         let inv_path = cache_path.join("sphinx").join(key).with_extension("inv");
 
         // TODO: This will be made more flexible once we add a permissive mode
-        // see https://github.com/savente93/snakedown/issues/38
+        // see https://github.com/aslowwriter/snakedown/issues/38
         if !inv_path.exists() && config.offline {
             continue;
         }
@@ -507,7 +507,7 @@ mod test {
         let result = render_docs(config_builder).await;
 
         // TODO: find a way to handle errors more nicely
-        // see also https://github.com/savente93/snakedown/issues/89
+        // see also https://github.com/aslowwriter/snakedown/issues/89
         match result {
             Ok(_) => bail!("render_docs did not exit with an error"),
             Err(e) => {

@@ -28,7 +28,7 @@ use url::Url;
 // `RawIndex::process(self) -> SerializableIndex` which is a new object with everything
 // preprocessed, incl stripped prefixes, all references validated and expanded etc.
 // then later we can just write everything to disk separately. That's a nice separation of concerns
-// see also: https://github.com/savente93/snakedown/issues/57
+// see also: https://github.com/aslowwriter/snakedown/issues/57
 
 #[derive(Debug)]
 pub struct RawIndex {
@@ -127,7 +127,7 @@ impl RawIndex {
             .insert(notebook_name.clone(), notebook_contents)
             .is_some()
         {
-            warn!("overwriting notbook called {notebook_name}")
+            warn!("overwriting notebook called {notebook_name}")
         }
         Ok(())
     }
@@ -209,7 +209,7 @@ impl RawIndex {
 
     //TODO: This is not an efficient way to do this, but for the test cases it works,
     //at some point we should find a more high performance solution.
-    // see: https://github.com/savente93/snakedown/issues/55
+    // see: https://github.com/aslowwriter/snakedown/issues/55
     pub fn pre_process<R: Renderer>(&mut self, render: R, site_rel_api_path: &Path) -> Result<()> {
         for (_key, object) in self.internal_object_store.iter_mut() {
             if let Some((mut object_docstring, used_references)) = object.extract_used_references()
@@ -333,7 +333,7 @@ pub fn suggest_known_alternative(
         .filter(|(_, score)| score < &max_edit_distance)
         .collect::<Vec<(String, usize)>>();
 
-    candidates.sort_by(|a, b| a.1.cmp(&b.1));
+    candidates.sort_by_key(|a| a.1);
 
     candidates.first().cloned()
 }

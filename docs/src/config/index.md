@@ -18,7 +18,7 @@ For a complete list of all options and their explanation see [the options page](
 
 This is a toml file with configuration options that snakedown will use. It can be located either in the current working directory or in `$HOME/.config/snakedown/snakedown.toml`
 
-And example file filled with all the defaults can be found [here](https://github.com/savente93/snakedown/blob/main/snakedown.example.toml)
+And example file filled with all the defaults can be found [here](https://github.com/aslowwriter/snakedown/blob/main/snakedown.example.toml)
 
 The possible values are documented below.
 

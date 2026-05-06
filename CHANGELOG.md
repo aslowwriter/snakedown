@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
-## [0.3.0](https://github.com/savente93/snakedown/compare/v0.2.0...v0.3.0) - 2026-02-08
+## [0.3.0](https://github.com/aslowwriter/snakedown/compare/v0.2.0...v0.3.0) - 2026-02-08
 
 ### Added
 
@@ -39,7 +39,7 @@ All notable changes to this project will be documented in this file.
 - *(deps)* bump JamesIves/github-pages-deploy-action
 - *(deps)* bump actions/checkout from 4 to 6
 
-## [0.2.0](https://github.com/savente93/snakedown/compare/v0.1.0...v0.2.0) - 2026-01-11
+## [0.2.0](https://github.com/aslowwriter/snakedown/compare/v0.1.0...v0.2.0) - 2026-01-11
 
 ### Added
 

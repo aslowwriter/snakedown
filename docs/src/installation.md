@@ -13,5 +13,5 @@ This will install the latest released version.
 If you want to install the latest dev version you can also do that:
 
 ```bash
-cargo install --git https://github.com/savente93/snakedown --branch main --locked
+cargo install --git https://github.com/aslowwriter/snakedown --branch main --locked
 ```

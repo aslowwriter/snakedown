@@ -1,4 +1,4 @@
 [submodule "tests/zola_test_site"]
 	path = tests/zola_test_site
-	url = git@github.com:savente93/zola-snakedown-theme
+	url = git@github.com:aslowwriter/zola-snakedown-theme
 	branch = main
