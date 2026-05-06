@@ -16,7 +16,7 @@ Default Value: `true`
 ## api_content_path
 The relative path from the site root (see [site_root](#siteroot)) to where the api docs are located. This is tracked separately because this needs to be reflected in the generated links (they need to be relative to the site root, not the current working directory for example).
 
-The full place where the docs will get placed is determined by joining `api_content_path` to `site_root` along with whatever intermediate path is required for the SSG (e.g. for zola, this is `content`). Meaning that by default the docs will be placed in `./docs/api/` for makrdown and `./docs/content/api/` for zola.
+The full place where the docs will get placed is determined by joining `api_content_path` to `site_root` along with whatever intermediate path is required for the SSG (e.g. for zola, this is `content`). Meaning that by default the docs will be placed in `./docs/api/` for markdown and `./docs/content/api/` for zola.
 
 Default value: `api`
 

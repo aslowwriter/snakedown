@@ -51,7 +51,8 @@ pub fn rank_media_types(media: &MediaType) -> usize {
         | MediaType::VegaV4(_)
         | MediaType::VegaV5(_)
         | MediaType::Vdom(_)
-        | MediaType::Other(_) => 0,
+        | MediaType::Other(_)
+        | _ => 0,
     }
 }
 
@@ -102,7 +103,8 @@ pub fn render_jupyter_display_data(cell_nr: usize, data: Media) -> Result<Option
         | MediaType::VegaV4(_)
         | MediaType::VegaV5(_)
         | MediaType::Vdom(_)
-        | MediaType::Other(_) => unreachable!(),
+        | MediaType::Other(_)
+        | &_ => unreachable!(),
     });
     richest.transpose()
 }

@@ -163,7 +163,7 @@ pub struct CliArgs {
     #[arg(long, short)]
     pub api_content_path: Option<PathBuf>,
 
-    /// The path to where the notbook output should be placed relative to the site_root
+    /// The path to where the notebook output should be placed relative to the site_root
     /// output will specifically be placed in `./<site_root>/<notebook_content_path>/`
     /// `user-guide/` by default. If you want the output to be the site root set this to the empty string
     #[arg(long)]

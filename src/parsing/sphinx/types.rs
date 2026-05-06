@@ -121,7 +121,9 @@ pub enum PyRole {
 }
 #[derive(Debug, PartialEq, EnumString)]
 #[strum(serialize_all = "camelCase")]
-pub enum RstRole {}
+pub enum RstRole {
+    Directive,
+}
 
 #[derive(Debug)]
 pub struct ExternalSphinxRef {

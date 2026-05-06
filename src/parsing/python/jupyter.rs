@@ -8,11 +8,11 @@ pub fn parse_notebook_file(path: &Path) -> Result<Vec<Cell>> {
 
     // Parse the notebook
     let notebook = match parse_notebook(&notebook_json)? {
-        Notebook::V4(notebook) => notebook,
-        Notebook::Legacy(notebook) => {
-            upgrade_legacy_notebook(notebook).map_err(|err| eyre!(err))?
-        }
-    };
+        Notebook::V4(notebook) => Ok(notebook),
+        Notebook::Legacy(notebook) => upgrade_legacy_notebook(notebook).map_err(|err| eyre!(err)),
+        Notebook::V4QuirksMode(v4_quirks) => Ok(v4_quirks.repair()),
+        Notebook::V3(_) | _ => Err(eyre!("unupported notebook version")),
+    }?;
 
     let metadata = notebook.metadata;
 
