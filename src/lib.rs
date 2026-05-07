@@ -14,12 +14,11 @@ pub use crate::fs::{get_module_name, get_package_modules, walk_package};
 use crate::indexing::external::cache::init_cache;
 use crate::indexing::external::fetch::fill_cache;
 use crate::indexing::index::RawIndex;
-use crate::parsing::sphinx::inv_file::parse_objects_inv_file;
-use crate::parsing::sphinx::types::{ExternalSphinxRef, StdRole};
 use crate::render::formats::Renderer;
 pub use crate::render::render_module;
 use crate::render::{jupyter::render_notebook, render_object};
-use parsing::sphinx::types::SphinxType;
+
+use sphinx_inv::{SphinxInventoryReader, SphinxReference, SphinxType, StdRole};
 
 use color_eyre::Result;
 use color_eyre::eyre::eyre;
@@ -69,14 +68,16 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
         }
         let external_base_url = Url::parse(&ext_index.url)?;
 
-        let inv_references = parse_objects_inv_file(&inv_path)?;
-        for r in inv_references {
+        let reference_reader = SphinxInventoryReader::from_path(&inv_path)?;
+        for maybe_ref in reference_reader {
+            let r = maybe_ref?;
             if !should_include_reference(&r) {
                 continue;
             }
+            let expanded_location = &r.expanded_location();
             index
                 .external_object_store
-                .insert(r.name, external_base_url.clone().join(&r.location)?);
+                .insert(r.name, external_base_url.clone().join(expanded_location)?);
         }
     }
 
@@ -175,7 +176,7 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
     Ok(errored)
 }
 
-fn should_include_reference(r: &ExternalSphinxRef) -> bool {
+fn should_include_reference(r: &SphinxReference) -> bool {
     // just include python refs and std doc refs, we'll see if we actually
     // need/want the rest
     match r.sphinx_type {
@@ -185,7 +186,10 @@ fn should_include_reference(r: &ExternalSphinxRef) -> bool {
         | SphinxType::Mathematics(_)
         | SphinxType::Cpp(_)
         | SphinxType::JavaScript(_)
-        | SphinxType::ReStructuredText(_) => false,
+        | SphinxType::ReStructuredText(_)
+        | SphinxType::Cmake(_)
+        | SphinxType::Sip(_)
+        | SphinxType::Http(_) => false,
     }
 }
 
