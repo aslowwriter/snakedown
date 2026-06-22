@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: suite (${{ matrix.os }})
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: true
       - uses: prefix-dev/setup-pixi@v0.9.6
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     name: docs
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: true
       - uses: prefix-dev/setup-pixi@v0.9.6
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     name: coverage
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: true
       - uses: prefix-dev/setup-pixi@v0.9.6
