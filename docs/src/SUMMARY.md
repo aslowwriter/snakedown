@@ -1,5 +1,7 @@
 # Summary
 
+## User manual
+
 [Introduction](introduction.md)
 
 - [Installation](./installation.md)
@@ -10,4 +12,8 @@
     - [Options](config/options.md)
     - [Customisation](config/customisation.md)
 ---
-- [Contributing](contributing.md)
+## Developer manual
+- [Contributing](contributing/index.md)
+    - [Dev guidelines & help](contributing/guidelines.md)
+    - [Adding support for new SSGs](contributing/adding-new-ssgs.md)
+    - [Benchmarking](contributing/benchmarking.md)
