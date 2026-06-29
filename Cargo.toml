@@ -58,7 +58,7 @@ rustpython-parser = "0.4.0"
 serde      = { version = "1", features = ["derive"] }
 sphinx_inv = { version = "0.3.0" }
 strum      = { version = "0.28.0", features = ["derive", "strum_macros"] }
-tera       = "1.20.1"
+tera       = "2.0.0"
 
 tokio = { version = "1.45", features = [
   "rt",
