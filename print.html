@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-237f6c32.js";
+            window.path_to_searchindex_js = "searchindex-778d18de.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-6f6e8175.js"></script>
+        <script src="toc-6ac43af2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -454,11 +454,18 @@ it is probably best to post on the issue how you are thinking of resolving the
 issue so you can get feedback early in the process. We want you to be
 successful and it can be discouraging to find out a lot of re-work is needed.
 We encourage you to reach out and ask questions early in the process if you are uncertain.</p>
-<p>Don’t know where to start? check out the issues labeled <a href="https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3A%22good%20first%20issue%22">good first issue</a> and <a href="https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3Amentoring-available">mentoring available</a>. In general these are beginner friendly with more detailed instructions.</p>
+<p>Don’t know where to start? Check out the issues labeled <a href="https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3A%22good%20first%20issue%22">good first issue</a> and <a href="https://github.com/aslowwriter/snakedown/issues?q=state%3Aopen%20label%3Amentoring-available">mentoring available</a>. In general these are beginner friendly with more detailed instructions.</p>
 <p>Already have an idea?  It might be good to first <a href="https://github.com/aslowwriter/snakedown/issues/new">create an issue</a>
 to propose it so we can make sure we are aligned and lower the risk of having
 to re-work some of it and the discouragement that goes along with that.</p>
-<h3 id="process"><a class="header" href="#process">Process</a></h3>
+<p>Also see what is involved in submitting a PR in the <a href="contributing/contributing/guidelines.html">guidelines</a> section of this book.</p>
+<h2 id="acknolwegements"><a class="header" href="#acknolwegements">Acknolwegements</a></h2>
+<ul>
+<li>thank you to <a href="https://github.com/epage">Ed Page</a>. These guidelines were adapted from <a href="https://github.com/epage/_rust">this</a> template which he wrote.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="dev-guidelines--help"><a href="#dev-guidelines--help" class="header">Dev guidelines &amp; help</a></h1>
+<h2 id="submitting-a-pr"><a class="header" href="#submitting-a-pr">Submitting a PR</a></h2>
 <p>As a heads up, we’ll be running your PR through the following gauntlet:</p>
 <ul>
 <li>warnings turned to compile errors</li>
@@ -479,9 +486,10 @@ fix or feature commits simple and clear.</p>
 <p>We understand having a clean history requires more advanced git skills;
 feel free to ask us for help! We might even suggest where it would work to be lax.</p>
 <p>We also understand that editing some early commits may cause a lot of churn with merge conflicts which can make it not worth editing all of the history. One way to do this is to just keep one big temporary commit (or a bunch of temporary commits) while you prototype until things are the way you want them to be, soft reset all the commits (or move all changes to a new branch) and then re-commit things in atomic commits one by one. This also gives you a good opportunity to do a self review!</p>
-<h4 id="coverage"><a class="header" href="#coverage">Coverage</a></h4>
+<p>When in doubt, requesting early feedback is allowed and even encouraged.</p>
+<h2 id="coverage"><a class="header" href="#coverage">Coverage</a></h2>
 <p>Coverage in Rust can be a bit fineky at times, and additionally coverage doesn’t always tell the whole story, so we usually don’t enforce hard limits on coverage. For example llvm-cov marking a file that only contains a <code>)?</code> when returning a <code>Result</code> that will (almost) never error is not uncommon. We don’t think there’s much value in enforcing that these lines be covered, so if you miss those for example, that’s okay. That being said, we do like to keep our coverage high, so if you don’t cover something, please have good explanation as to why!</p>
-<h4 id="organisation"><a class="header" href="#organisation">Organisation</a></h4>
+<h2 id="organisation"><a class="header" href="#organisation">Organisation</a></h2>
 <p>For code organization, we recommend</p>
 <ul>
 <li>Grouping <code>impl</code> blocks next to their type (or trait)</li>
@@ -492,20 +500,10 @@ feel free to ask us for help! We might even suggest where it would work to be la
 </ul>
 </li>
 </ul>
-<h3 id="benchmarking"><a class="header" href="#benchmarking">Benchmarking</a></h3>
-<p>Benchmarking/profilling to improve performance is tricky, because so many smart and complicated tricks are already done for you by compilers/operating systems/hardware etc. meaning that you have to make sure you work together with them instead of against them. Performance measuring and improving is part science, part art. To accommodate for this we have designed our benchmarks with the following considerations:</p>
-<ul>
-<li>Results of the benchmarks are intentionally not saved because there is an inherent amount of irreproducibility to them</li>
-<li>While the results are not saved, the <em>setup</em> is. All benchmarks should use exactly the config used in <code>benchmark-config.toml</code> for the snakedown configuration and the <code>bench</code> profile for compilation (unless you are benchmarking different profiles). If you modify any of these you’ll have to run new baselines!</li>
-<li>Remember that benchmarks are inherently hardware bound, so do not pay too much attention to the individual numbers, and if you are bench marking yourself, remember to always run the baselines yourself.</li>
-<li>There are currently two benchmark commands in the <code>pixi.toml</code> we use:
-<ul>
-<li><code>bench</code> this runs the citereon benchmark. Use this if you want to see if your changes had an impact on performance</li>
-<li><code>flamegraph</code> Runs the benchmark config under <code>cargo flamegraph</code> which will produce a graph that can help you gain insight into which parts of the code need optimising. Knowing how to read this graph can be tricky at first. See the <a href="https://github.com/flamegraph-rs/flamegraph">flamegrpah repo</a> for more information on this</li>
-</ul>
-</li>
-</ul>
-<h3 id="dev-tips"><a class="header" href="#dev-tips">Dev tips</a></h3>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<h3 id="my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on"><a class="header" href="#my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on">My unit tests are passing but the integration test is failing, what’s going on?</a></h3>
+<p>Make sure that you’ve initialized the git submodules. We use submodules to include the supported themes for the SSGs in our repo. If you’ve already cloned the repo, you can do so by executing the command <code>git submodule update --recursive --init</code>. If you haven’t you can make sure this is done correctly by cloning with the <code>--recursive</code> option like so: <code>git clone --recursive https://github.com/aslowwriter/snakedown</code></p>
+<h2 id="general-dev-tips"><a class="header" href="#general-dev-tips">General dev tips</a></h2>
 <p>We use <a href="https://pixi.prefix.dev/latest/"><code>pixi</code></a> to manage installation of external tools, and as a cross platform task runner. Though originally developed for Python, it has access to <code>conda-forge</code> where many tools are already available, as well as making sure we use the correct versions through it’s lockfile.</p>
 <p>Though not necessary, as you can install the tools yourself and run the commands listed in the <code>pixi.toml</code> file yourself, we recommend accessing our workflows through <code>pixi</code>. You can install all the dependencies with the command <code>pixi install</code>. The default environment contains everything you might need and as a dev this is almost certainly what you want.</p>
 <p>You can see which tasks you can run with the command <code>pixi task run</code>. This should give you an overview of all common workflows. Do note that if you install everything through pixi, then you will need to either activate the environment with <code>pixi shell</code> or run tasks (including things like <code>cargo run</code>) through pixi like so: <code>pixi run test</code> or <code>pixi run cargo run</code>.</p>
@@ -521,14 +519,42 @@ feel free to ask us for help! We might even suggest where it would work to be la
 </li>
 </ul>
 <p>Also keep in mind not all our rules have to be met at every single stage. It is totally allowed to iterate/prototype until you are happy with things, and then clean up after!</p>
-<h3 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h3>
-<h4 id="my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on"><a class="header" href="#my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on">My unit tests are passing but the integration test is failing, what’s going on?</a></h4>
-<p>Make sure that you’ve initialized the git submodules. We use submodules to include the supported themes for the SSGs in our repo. If you’ve already cloned the repo, you can do so by executing the command <code>git submodule update --recursive --init</code>. If you haven’t you can make sure this is done correctly by cloning with the <code>--recursive</code> option like so: <code>git clone --recursive https://github.com/aslowwriter/snakedown</code></p>
-<h2 id="publishing"><a class="header" href="#publishing">Publishing</a></h2>
-<p>For this project we have a <a href="https://release-plz.dev/docs"><code>release-plz</code></a> action setup. This gets updated automatically, and to release to all the places we distribute too all you have to do is edit and merge that release PR.</p>
-<h2 id="acknolwegements"><a class="header" href="#acknolwegements">Acknolwegements</a></h2>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="adding-support-for-new-ssgs"><a href="#adding-support-for-new-ssgs" class="header">Adding support for new SSGs</a></h1>
+<h2 id="adding-new-static-site-generators"><a class="header" href="#adding-new-static-site-generators">Adding new static site generators</a></h2>
+<p>Note that while adding new static site generators to snakedown might not be necessarily complicated, it does require some work. In this page you’ll find the requirements, some guideines on what to do, and some tips you may find useful if you want to include support for a new ssg in snakedown.</p>
+<p>As with all others, the rules laid out here are more guidelines than hard rules. You can deviate from them, but you should have a good reason for doing so.</p>
+<h3 id="inclusion-cirteria"><a class="header" href="#inclusion-cirteria">Inclusion cirteria</a></h3>
+<p>There are a couple of things to consider when deciding to add support for an SSG:</p>
 <ul>
-<li>thank you to <a href="https://github.com/epage">Ed Page</a>. These guidelines were adapted from <a href="https://github.com/epage/_rust">this</a> template which he wrote.</li>
+<li>It should be a well maintained, active project</li>
+<li>It should have a reasonable userbase (in terms of size)</li>
+<li>It should accept markdown as an input format</li>
+<li>It should be installable though <code>pixi</code> (which for all intents and purposes mean that it should be on either <code>pypi</code> or <code>conda-forge</code>) so that we can keep our testing environment consistent.</li>
+</ul>
+<h3 id="necessary-steps"><a class="header" href="#necessary-steps">Necessary steps</a></h3>
+<ol>
+<li>The SSG is added to the pixi environment</li>
+<li>The <code>Renderer</code> trait is implemented in <code>crate::render::formats</code> and covered by unit tests</li>
+<li>The expected output of rendering with the test package is in a publicly available repository and added as a git submodule so it can be used for integration testing. A link to this repo should also be included in [usage/static-site-generators.md]</li>
+<li>There is atleast one theme for the SSG that is compatible with the output of snakedown. This can be either an existing if available or custom made, but it must work out of the box. (you can use the output in <code>tests/rendered_full</code> and <code>tests/rendered_notebooks</code> to test this)</li>
+<li>The format is added to the config and cli options as appropriate (see <code>src/congi.rs</code> and <code>src/cli/mod.rs</code> respectively )</li>
+</ol>
+<p>Please include at least one screenshot of the example website in your PR.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="benchmarking-1"><a href="#benchmarking-1" class="header">Benchmarking</a></h1>
+<h3 id="benchmarking"><a class="header" href="#benchmarking">Benchmarking</a></h3>
+<p>Benchmarking/profilling to improve performance is tricky, because so many smart and complicated tricks are already done for you by compilers/operating systems/hardware etc. meaning that you have to make sure you work together with them instead of against them. Performance measuring and improving is part science, part art. To accommodate for this we have designed our benchmarks with the following considerations:</p>
+<ul>
+<li>Results of the benchmarks are intentionally not saved because there is an inherent amount of irreproducibility to them</li>
+<li>While the results are not saved, the <em>setup</em> is. All benchmarks should use exactly the config used in <code>benchmark-config.toml</code> for the snakedown configuration and the <code>bench</code> profile for compilation (unless you are benchmarking different profiles). If you modify any of these you’ll have to run new baselines!</li>
+<li>Remember that benchmarks are inherently hardware bound, so do not pay too much attention to the individual numbers, and if you are bench marking yourself, remember to always run the baselines yourself.</li>
+<li>There are currently two benchmark commands in the <code>pixi.toml</code> we use:
+<ul>
+<li><code>bench</code> this runs the citereon benchmark. Use this if you want to see if your changes had an impact on performance</li>
+<li><code>flamegraph</code> Runs the benchmark config under <code>cargo flamegraph</code> which will produce a graph that can help you gain insight into which parts of the code need optimising. Knowing how to read this graph can be tricky at first. See the <a href="https://github.com/flamegraph-rs/flamegraph">flamegrpah repo</a> for more information on this</li>
+</ul>
+</li>
 </ul>
 
                     </main>

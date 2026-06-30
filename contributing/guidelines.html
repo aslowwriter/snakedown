@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Installation - Snakedown User Guide</title>
+        <title>Dev guidelines &amp; help - Snakedown User Guide</title>
 
 
         <!-- Custom HTML head -->
@@ -12,33 +12,33 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff">
 
-        <link rel="icon" href="favicon-de23e50b.svg">
-        <link rel="shortcut icon" href="favicon-8114d1fc.png">
-        <link rel="stylesheet" href="css/variables-8adf115d.css">
-        <link rel="stylesheet" href="css/general-2459343d.css">
-        <link rel="stylesheet" href="css/chrome-ae938929.css">
-        <link rel="stylesheet" href="css/print-9e4910d8.css" media="print">
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-2459343d.css">
+        <link rel="stylesheet" href="../css/chrome-ae938929.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
 
         <!-- Fonts -->
-        <link rel="stylesheet" href="fonts/fonts-9644e21d.css">
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" id="mdbook-highlight-css" href="highlight-493f70e1.css">
-        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="tomorrow-night-4c0ae647.css">
-        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
 
 
         <!-- Provide site root and default themes to javascript -->
         <script>
-            const path_to_root = "";
+            const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-778d18de.js";
+            window.path_to_searchindex_js = "../searchindex-778d18de.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-6ac43af2.js"></script>
+        <script src="../toc-6ac43af2.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -105,7 +105,7 @@
             <!-- populated by js -->
             <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
             <noscript>
-                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
             </noscript>
             <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -140,7 +140,7 @@
                     <h1 class="menu-title">Snakedown User Guide</h1>
 
                     <div class="right-buttons">
-                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
                         </a>
 
@@ -174,25 +174,70 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
-<h2 id="cargo"><a class="header" href="#cargo"><code>cargo</code></a></h2>
-<p>Currently the only place where snakedown is distributed to is <code>crates.io</code>. Other places might be considered later, but for how the easiest way to install it is by using <code>cargo install</code> like so:</p>
-<pre><code class="language-bash">cargo install snakedown
-</code></pre>
-<p>This will install the latest released version.</p>
-<p>If you want to install the latest dev version you can also do that:</p>
-<pre><code class="language-bash">cargo install --git https://github.com/aslowwriter/snakedown --branch main --locked
-</code></pre>
+                        <h2 id="submitting-a-pr"><a class="header" href="#submitting-a-pr">Submitting a PR</a></h2>
+<p>As a heads up, we’ll be running your PR through the following gauntlet:</p>
+<ul>
+<li>warnings turned to compile errors</li>
+<li><code>cargo test</code></li>
+<li><code>rustfmt</code></li>
+<li><code>clippy</code></li>
+<li><code>rustdoc</code></li>
+<li><code>taplo</code> (toml formatter)</li>
+<li><code>codecov</code></li>
+<li><a href="https://github.com/crate-ci/committed"><code>committed</code></a> as we use <a href="https://www.conventionalcommits.org">Conventional</a> commit style. Ideally the commit message shouldn’t just say what was done but also why.</li>
+<li><a href="https://github.com/crate-ci/typos"><code>typos</code></a> to check spelling</li>
+</ul>
+<p>In generally you can make sure these are okay by installing the <code>pre-commit</code> hooks in this repository. Not everything can be checked automatically though.</p>
+<p>We also don’t allow “TODO” comments in the code unless they also link to an issue, since TODO comments usually get forgotten and overlooked.</p>
+<p>We request that the commit history gets cleaned up so that that commits are atomic, meaning they are complete and have a single responsibility. A complete commit should build, pass tests, update documentation and tests, and not have dead or commented out code.</p>
+<p>PRs should tell a cohesive story, with refactor and test commits that keep the
+fix or feature commits simple and clear.</p>
+<p>We understand having a clean history requires more advanced git skills;
+feel free to ask us for help! We might even suggest where it would work to be lax.</p>
+<p>We also understand that editing some early commits may cause a lot of churn with merge conflicts which can make it not worth editing all of the history. One way to do this is to just keep one big temporary commit (or a bunch of temporary commits) while you prototype until things are the way you want them to be, soft reset all the commits (or move all changes to a new branch) and then re-commit things in atomic commits one by one. This also gives you a good opportunity to do a self review!</p>
+<p>When in doubt, requesting early feedback is allowed and even encouraged.</p>
+<h2 id="coverage"><a class="header" href="#coverage">Coverage</a></h2>
+<p>Coverage in Rust can be a bit fineky at times, and additionally coverage doesn’t always tell the whole story, so we usually don’t enforce hard limits on coverage. For example llvm-cov marking a file that only contains a <code>)?</code> when returning a <code>Result</code> that will (almost) never error is not uncommon. We don’t think there’s much value in enforcing that these lines be covered, so if you miss those for example, that’s okay. That being said, we do like to keep our coverage high, so if you don’t cover something, please have good explanation as to why!</p>
+<h2 id="organisation"><a class="header" href="#organisation">Organisation</a></h2>
+<p>For code organization, we recommend</p>
+<ul>
+<li>Grouping <code>impl</code> blocks next to their type (or trait)</li>
+<li>Grouping private items after the <code>pub</code> item that uses them.
+<ul>
+<li>The intent is to help people quickly find the “relevant” details, allowing them to “dig deeper” as needed.  Or put another way, the <code>pub</code> items serve as a table-of-contents.</li>
+<li>The exact order is fuzzy; do what makes sense</li>
+</ul>
+</li>
+</ul>
+<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
+<h3 id="my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on"><a class="header" href="#my-unit-tests-are-passing-but-the-integration-test-is-failing-whats-going-on">My unit tests are passing but the integration test is failing, what’s going on?</a></h3>
+<p>Make sure that you’ve initialized the git submodules. We use submodules to include the supported themes for the SSGs in our repo. If you’ve already cloned the repo, you can do so by executing the command <code>git submodule update --recursive --init</code>. If you haven’t you can make sure this is done correctly by cloning with the <code>--recursive</code> option like so: <code>git clone --recursive https://github.com/aslowwriter/snakedown</code></p>
+<h2 id="general-dev-tips"><a class="header" href="#general-dev-tips">General dev tips</a></h2>
+<p>We use <a href="https://pixi.prefix.dev/latest/"><code>pixi</code></a> to manage installation of external tools, and as a cross platform task runner. Though originally developed for Python, it has access to <code>conda-forge</code> where many tools are already available, as well as making sure we use the correct versions through it’s lockfile.</p>
+<p>Though not necessary, as you can install the tools yourself and run the commands listed in the <code>pixi.toml</code> file yourself, we recommend accessing our workflows through <code>pixi</code>. You can install all the dependencies with the command <code>pixi install</code>. The default environment contains everything you might need and as a dev this is almost certainly what you want.</p>
+<p>You can see which tasks you can run with the command <code>pixi task run</code>. This should give you an overview of all common workflows. Do note that if you install everything through pixi, then you will need to either activate the environment with <code>pixi shell</code> or run tasks (including things like <code>cargo run</code>) through pixi like so: <code>pixi run test</code> or <code>pixi run cargo run</code>.</p>
+<p>In case you would like to install the tools yourself, below is a list of tools we use:</p>
+<ul>
+<li><a href="https://pre-commit.com"><code>pre-commit</code></a> This will run lints when you try to commit so you don’t fail CI tasks unnecessarily. Make sure to activate the hooks by running <code>pre-commit install</code> after you clone the repo.</li>
+<li><a href="https://github.com/Canop/bacon"><code>bacon</code></a> A runner that will watch your files and run checks, tests, linting etc. when they change. Very useful while developing for fast feedback cycles.</li>
+<li><a href="https://github.com/cli/cli"><code>gh</code></a> Can be used this to quickly open PRs when done working locally and make sure they aren’t duplicated. Quite convenient, but not necessary.</li>
+<li>While our CI will test the outputs with all generators we support, and therefore you don’t technically have to install them, it makes local development a lot easier. Currently we support the following formats:
+<ul>
+<li><a href="https://github.com/getzola/zola"><code>zola</code></a></li>
+</ul>
+</li>
+</ul>
+<p>Also keep in mind not all our rules have to be met at every single stage. It is totally allowed to iterate/prototype until you are happy with things, and then clean up after!</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../contributing/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="usage/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../contributing/adding-new-ssgs.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -202,11 +247,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../contributing/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="usage/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../contributing/adding-new-ssgs.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -226,13 +271,13 @@
         </script>
 
 
-        <script src="elasticlunr-ef4e11c1.min.js"></script>
-        <script src="mark-09e88c2c.min.js"></script>
-        <script src="searcher-c2a407aa.js"></script>
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-c2a407aa.js"></script>
 
-        <script src="clipboard-1626706a.min.js"></script>
-        <script src="highlight-abc7f01d.js"></script>
-        <script src="book-a0b12cfe.js"></script>
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
 
