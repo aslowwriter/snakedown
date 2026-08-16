@@ -1,4 +1,7 @@
+use crate::render_notebook;
+use crate::render_object;
 use crate::{
+    config::ExternalIndex,
     parsing::{
         ObjectDocumentation,
         python::{
@@ -10,14 +13,19 @@ use crate::{
         },
     },
     render::formats::Renderer,
+    should_include_reference,
 };
 use color_eyre::{Report, Result, eyre::eyre};
 use edit_distance::edit_distance;
 use nbformat::v4::Cell;
+use sphinx_inv::SphinxInventoryReader;
+use std::fs::{File, create_dir_all};
+use std::io::Write;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
+use tera::Context;
 use tracing::warn;
 use url::Url;
 
@@ -132,6 +140,37 @@ impl RawIndex {
         Ok(())
     }
 
+    pub fn load_external_references(
+        &mut self,
+        externals: HashMap<String, ExternalIndex>,
+        cache_path: &Path,
+        permissive: bool,
+    ) -> Result<()> {
+        for (key, ext_index) in externals {
+            let inv_path = cache_path.join("sphinx").join(key).with_extension("inv");
+
+            // TODO: This will be made more flexible once we add a permissive mode
+            // see https://github.com/aslowwriter/snakedown/issues/38
+            if !inv_path.exists() && permissive {
+                continue;
+            }
+            let external_base_url = Url::parse(&ext_index.url)?;
+
+            let reference_reader = SphinxInventoryReader::from_path(&inv_path)?;
+            for maybe_ref in reference_reader {
+                let r = maybe_ref?;
+                if !should_include_reference(&r) {
+                    continue;
+                }
+                let expanded_location = &r.expanded_location();
+                self.external_object_store
+                    .insert(r.name, external_base_url.clone().join(expanded_location)?);
+            }
+        }
+
+        Ok(())
+    }
+
     pub fn validate_references(&self) -> Result<(), Vec<Report>> {
         let mut errors: Vec<_> = Vec::new();
         for (key, obj) in self.internal_object_store.iter() {
@@ -211,7 +250,7 @@ impl RawIndex {
     //at some point we should find a more high performance solution.
     // see: https://github.com/aslowwriter/snakedown/issues/55
     pub fn pre_process<R: Renderer>(&mut self, render: R, site_rel_api_path: &Path) -> Result<()> {
-        for (_key, object) in self.internal_object_store.iter_mut() {
+        for object in self.internal_object_store.values_mut() {
             if let Some((mut object_docstring, used_references)) = object.extract_used_references()
             {
                 for used_ref in used_references {
@@ -235,6 +274,91 @@ impl RawIndex {
             }
         }
 
+        Ok(())
+    }
+
+    fn serialize_pages<R: Renderer>(
+        &self,
+        renderer: &R,
+        ctx: &Context,
+        out_api_path: &Path,
+        skip_write: bool,
+    ) -> Result<()> {
+        if !skip_write {
+            create_dir_all(out_api_path)?;
+        }
+
+        for (key, object) in self.internal_object_store.iter() {
+            let file_path = out_api_path.join(key).with_added_extension("md");
+            let rendered = render_object(object, key.clone(), &renderer, ctx)?;
+            let rendered_trimmed = rendered.trim_start();
+            if !skip_write {
+                let mut file = File::create(file_path)?;
+                file.write_all(rendered_trimmed.as_bytes())?;
+            }
+        }
+
+        if let Some((index_file_path, index_file_content)) =
+            &renderer.index_file(Some("API".to_string()))
+            && !skip_write
+        {
+            let mut file = File::create(out_api_path.join(index_file_path))?;
+            file.write_all(index_file_content.as_bytes())?;
+        }
+        Ok(())
+    }
+
+    fn serialize_notebooks<R: Renderer>(
+        &self,
+        notebook_out_path: &Path,
+        renderer: &R,
+        skip_write: bool,
+    ) -> Result<()> {
+        if !skip_write {
+            create_dir_all(notebook_out_path)?;
+        }
+        for (key, cells) in self.notebook_store.iter() {
+            let dir_path = notebook_out_path.join(key);
+            let file_path = dir_path.clone().join("index").with_added_extension("md");
+            let mut rendered = render_notebook(
+                dir_path
+                    .file_stem()
+                    .map(|p| p.display().to_string())
+                    .as_deref(),
+                cells,
+                &renderer,
+            )?;
+            // some tools insert an extra EOL at the end of the file
+            if !rendered.text.ends_with("\n") {
+                rendered.text.push('\n');
+            }
+
+            if !skip_write {
+                create_dir_all(dir_path.clone())?;
+                let mut file = File::create(file_path)?;
+                file.write_all(rendered.text.as_bytes())?;
+                for img in rendered.images {
+                    let mut img_file = File::create(dir_path.join(img.name))?;
+                    img_file.write_all(&img.data)?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    pub fn serialize<R: Renderer>(
+        self,
+        renderer: &R,
+        ctx: &Context,
+        out_api_path: &Path,
+        notebook_out_path: Option<&Path>,
+        skip_write: bool,
+    ) -> Result<()> {
+        self.serialize_pages(renderer, ctx, out_api_path, skip_write)?;
+        if let Some(notebook_out_path) = &notebook_out_path {
+            self.serialize_notebooks(notebook_out_path, renderer, skip_write)?;
+        }
         Ok(())
     }
 }

@@ -272,7 +272,7 @@ fn render_comprehension(comp: Comprehension) -> String {
 fn render_keyword(keyword: Keyword) -> String {
     let mut out = String::new();
     let fmt = if let Some(arg) = keyword.arg {
-        format!("{}={}", &arg, &render_expr(keyword.value))
+        format!("{}={}", arg, render_expr(keyword.value))
     } else {
         format!("**{}", render_expr(keyword.value))
     };
