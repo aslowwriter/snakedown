@@ -4,8 +4,6 @@ pub mod indexing;
 pub mod parsing;
 pub mod render;
 
-use std::fs::{File, create_dir_all};
-use std::io::Write;
 use std::path::PathBuf;
 
 use crate::config::ConfigBuilder;
@@ -18,12 +16,11 @@ use crate::render::formats::Renderer;
 pub use crate::render::render_module;
 use crate::render::{jupyter::render_notebook, render_object};
 
-use sphinx_inv::{SphinxInventoryReader, SphinxReference, SphinxType, StdRole};
+use sphinx_inv::{SphinxReference, SphinxType, StdRole};
 
 use color_eyre::Result;
 use color_eyre::eyre::eyre;
 use tera::Context;
-use url::Url;
 
 pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> {
     let config = config_builder.build()?;
@@ -58,28 +55,7 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
         fill_cache(&config.externals).await?;
     }
 
-    for (key, ext_index) in config.externals {
-        let inv_path = cache_path.join("sphinx").join(key).with_extension("inv");
-
-        // TODO: This will be made more flexible once we add a permissive mode
-        // see https://github.com/aslowwriter/snakedown/issues/38
-        if !inv_path.exists() && config.offline {
-            continue;
-        }
-        let external_base_url = Url::parse(&ext_index.url)?;
-
-        let reference_reader = SphinxInventoryReader::from_path(&inv_path)?;
-        for maybe_ref in reference_reader {
-            let r = maybe_ref?;
-            if !should_include_reference(&r) {
-                continue;
-            }
-            let expanded_location = &r.expanded_location();
-            index
-                .external_object_store
-                .insert(r.name, external_base_url.clone().join(expanded_location)?);
-        }
-    }
+    index.load_external_references(config.externals, &cache_path, config.offline)?;
 
     crawl_package(
         &mut index,
@@ -104,74 +80,25 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
 
     index.pre_process(&config.renderer, &config.api_content_path)?;
 
-    if !config.skip_write {
-        create_dir_all(&out_api_path)?;
-    }
+    // even though notebook_path itself isn't part of the computation
+    // it is still the start of the chain bc if that one is none the rest
+    // doesn't have to be computed
+    let nb_out_path = config.notebook_path.map(|_| {
+        config.site_root.join(
+            config
+                .notebook_content_path
+                .or_else(|| config.renderer.content_path())
+                .unwrap_or_default(),
+        )
+    });
 
-    for (key, object) in index.internal_object_store.iter() {
-        let file_path = out_api_path.join(key).with_added_extension("md");
-        let rendered = render_object(object, key.clone(), &config.renderer, &ctx)?;
-        let rendered_trimmed = rendered.trim_start();
-        if !config.skip_write {
-            let mut file = File::create(file_path)?;
-            file.write_all(rendered_trimmed.as_bytes())?;
-        }
-    }
-
-    if let Some(notebook_path) = &config.notebook_path {
-        let out_nb_path = if let Some(content_path) = config.renderer.content_path() {
-            config.site_root.clone().join(content_path).join(
-                config
-                    .notebook_content_path
-                    .clone()
-                    .unwrap_or(notebook_path.clone()),
-            )
-        } else {
-            config.site_root.clone().join(
-                config
-                    .notebook_content_path
-                    .clone()
-                    .unwrap_or(notebook_path.clone()),
-            )
-        };
-        if !config.skip_write {
-            create_dir_all(&out_nb_path)?;
-        }
-        for (key, cells) in index.notebook_store.iter() {
-            let dir_path = out_nb_path.join(key);
-            let file_path = dir_path.clone().join("index").with_added_extension("md");
-            let mut rendered = render_notebook(
-                dir_path
-                    .file_stem()
-                    .map(|p| p.display().to_string())
-                    .as_deref(),
-                cells,
-                &config.renderer,
-            )?;
-            // some tools insert an extra EOL at the end of the file
-            if !rendered.text.ends_with("\n") {
-                rendered.text.push('\n');
-            }
-
-            if !config.skip_write {
-                create_dir_all(dir_path.clone())?;
-                let mut file = File::create(file_path)?;
-                file.write_all(rendered.text.as_bytes())?;
-                for img in rendered.images {
-                    let mut img_file = File::create(dir_path.join(img.name))?;
-                    img_file.write_all(&img.data)?;
-                }
-            }
-        }
-    }
-
-    if let Some((index_file_path, index_file_content)) =
-        &config.renderer.index_file(Some("API".to_string()))
-        && !config.skip_write
-    {
-        let mut file = File::create(out_api_path.join(index_file_path))?;
-        file.write_all(index_file_content.as_bytes())?;
-    }
+    index.serialize(
+        &config.renderer,
+        &ctx,
+        &out_api_path,
+        nb_out_path.as_deref(),
+        config.skip_write,
+    )?;
 
     Ok(errored)
 }

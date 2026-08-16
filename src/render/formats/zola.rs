@@ -10,7 +10,7 @@ pub struct ZolaRenderer {}
 
 impl Renderer for ZolaRenderer {
     fn render_header(&self, content: &str, level: usize) -> String {
-        format!("{} {}", &"#".repeat(level), content.trim())
+        format!("{} {}", "#".repeat(level), content.trim())
     }
 
     fn render_front_matter(&self, title: Option<&str>) -> String {
