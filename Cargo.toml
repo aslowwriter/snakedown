@@ -39,28 +39,28 @@ name    = "test_pkg"
 harness = false
 
 [dependencies]
-base64              = "0.22.1"
+base64              = "0.23.1"
 clap                = { version = "4", features = ["derive", "unicode", "cargo"] }
-clap-verbosity-flag = { version = "3.0.3", features = ["tracing"] }
+clap-verbosity-flag = { version = "3.0.4", features = ["tracing"] }
 color-eyre          = "0.6"
-console             = "0.16.2"
+console             = "0.16.4"
 dialoguer           = "0.12.0"
 edit-distance       = "2.2.2"
-flate2              = "1.1.2"
-jupyter-protocol    = "2.0.1"
+flate2              = "1.1.9"
+jupyter-protocol    = "2.0.2"
 
-lazy-regex        = "3.4.1"
+lazy-regex        = "3.6.1"
 nbformat          = "3.0.0"
 pyproject-toml    = "0.13.7"
-reqwest           = { version = "0.13.3", features = ["blocking"] }
+reqwest           = { version = "0.13.4", features = ["blocking"] }
 rustpython-parser = "0.4.0"
 
 serde      = { version = "1", features = ["derive"] }
-sphinx_inv = { version = "0.3.0" }
+sphinx_inv = { version = "0.4.0" }
 strum      = { version = "0.28.0", features = ["derive", "strum_macros"] }
-tera       = "2.1.0"
+tera       = "2.1.1"
 
-tokio = { version = "1.45", features = [
+tokio = { version = "1.53", features = [
   "rt",
   "rt-multi-thread",
   "io-util",
@@ -73,20 +73,20 @@ tokio = { version = "1.45", features = [
   "sync",
 ] }
 
-toml               = "1.1.2"
+toml               = "1.1.4"
 tracing            = { version = "0", features = ["attributes"] }
 tracing-error      = "0"
 tracing-subscriber = "0"
-url                = "2.5.4"
+url                = "2.5.8"
 walkdir            = "2.5.0"
 
 [dev-dependencies]
-assert_cmd        = "2.0.17"
-assert_fs         = "1.1.3"
+assert_cmd        = "2.2.2"
+assert_fs         = "1.1.4"
 criterion         = { version = "0.8.2", features = ["async_tokio", "html_reports"] }
 pretty_assertions = "1"
-tempfile          = "3.20.0"
-tracing-test      = "0.2.5"
+tempfile          = "3.27.0"
+tracing-test      = "0.2.6"
 
 # please tell me what to do Clippy-senpai
 [lints.clippy]
