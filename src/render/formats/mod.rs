@@ -1,7 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use color_eyre::Result;
-
 pub mod md;
 pub mod zola;
 
@@ -13,7 +11,7 @@ pub trait Renderer {
         display_text: Option<String>,
         target_prefix: &Path,
         target: String,
-    ) -> Result<String>;
+    ) -> String;
 
     // This is on the Renderer because it is ssg specific.
     // e.g. zola places content in the `content` folder at the site root
@@ -33,7 +31,7 @@ impl<T: Renderer + ?Sized> Renderer for &T {
         display_text: Option<String>,
         target_prefix: &Path,
         target: String,
-    ) -> Result<String> {
+    ) -> String {
         (**self).render_reference(display_text, target_prefix, target)
     }
     fn render_front_matter(&self, title: Option<&str>) -> String {
@@ -60,7 +58,7 @@ impl Renderer for Box<dyn Renderer> {
         display_text: Option<String>,
         target_prefix: &Path,
         target: String,
-    ) -> Result<String> {
+    ) -> String {
         (**self).render_reference(display_text, target_prefix, target)
     }
     fn content_path(&self) -> Option<PathBuf> {

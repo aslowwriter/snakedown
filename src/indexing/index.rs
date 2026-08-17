@@ -266,7 +266,7 @@ impl RawIndex {
                         .unwrap_or_else(|| used_ref.fully_qualified_name.clone());
 
                     let expanded_ref =
-                        render.render_reference(display_text, site_rel_api_path, target)?;
+                        render.render_reference(display_text, site_rel_api_path, target);
                     object_docstring =
                         object_docstring.replace(&used_ref.original(), &expanded_ref);
                 }
