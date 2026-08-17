@@ -9,6 +9,8 @@ use rustpython_parser::{
 };
 use std::{fs::File, io::Read, path::Path};
 
+use crate::indexing::content::{ContentNode, parse_contents};
+
 pub fn parse_python_file(path: &Path) -> Result<Mod> {
     let mut file = File::open(path)?;
     let mut file_content = String::new();
@@ -22,7 +24,10 @@ pub fn parse_python_str(content: &str) -> Result<Mod> {
     Ok(parsed?)
 }
 
-pub(crate) fn extract_docstring_from_body(body: &[Stmt], indent_level: usize) -> Option<String> {
+pub(crate) fn extract_docstring_from_body(
+    body: &[Stmt],
+    indent_level: usize,
+) -> Option<Vec<ContentNode>> {
     match body.first() {
         Some(Stmt::Expr(StmtExpr { range: _, value })) => {
             if let Expr::Constant(ExprConstant {
@@ -66,7 +71,7 @@ pub(crate) fn extract_docstring_from_body(body: &[Stmt], indent_level: usize) ->
                     .collect::<Result<Vec<&str>>>()
                     .expect("Could not consistently strip prefix. most likely a bug in program")
                     .join("\n");
-                Some(docstring_stripped.trim().to_string().clone())
+                parse_contents(&mut docstring_stripped.as_ref()).ok()
             } else {
                 None
             }

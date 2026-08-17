@@ -199,7 +199,9 @@ impl ConfigBuilder {
     pub fn build(self) -> Result<Config> {
         let renderer: Box<dyn Renderer> = match self.ssg {
             Some(SSG::Markdown) | None => Box::new(MdRenderer::new()),
-            Some(SSG::Zola) => Box::new(ZolaRenderer {}),
+            Some(SSG::Zola) => Box::new(ZolaRenderer {
+                rel_path_to_api: PathBuf::from("api"),
+            }),
         };
 
         let mut external_linkings = HashMap::new();

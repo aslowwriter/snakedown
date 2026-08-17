@@ -78,7 +78,7 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
         )),
     }?;
 
-    index.pre_process(&config.renderer, &config.api_content_path)?;
+    index.pre_process()?;
 
     // even though notebook_path itself isn't part of the computation
     // it is still the start of the chain bc if that one is none the rest

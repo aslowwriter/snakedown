@@ -1,4 +1,5 @@
 use color_eyre::eyre::Result;
+use pretty_assertions::assert_eq;
 use std::fs;
 use tempfile::tempdir;
 
