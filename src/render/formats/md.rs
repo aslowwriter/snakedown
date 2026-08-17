@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use color_eyre::Result;
 use url::Url;
 
 use crate::render::formats::Renderer;
@@ -30,17 +29,16 @@ impl Renderer for MdRenderer {
         display_text: Option<String>,
         _target_prefix: &Path,
         target: String,
-    ) -> Result<String> {
+    ) -> String {
         let t = if Url::parse(&target).is_ok() {
             target
         } else {
             format!("{}.md", target)
         };
-        let rendered = match display_text {
+        match display_text {
             Some(text) => format!("[{text}]({t})"),
             None => format!("[{t}]({t})"),
-        };
-        Ok(rendered)
+        }
     }
 
     fn content_path(&self) -> Option<PathBuf> {
@@ -73,7 +71,7 @@ mod test {
     fn test_render_external_ref() -> Result<()> {
         let text = String::from("foo");
         let url = String::from("https://example.com/docs/foo/bar/baz.html#Bullshit");
-        let out = MdRenderer::new().render_reference(Some(text), &PathBuf::from(""), url)?;
+        let out = MdRenderer::new().render_reference(Some(text), &PathBuf::from(""), url);
         assert_eq!(
             out,
             String::from("[foo](https://example.com/docs/foo/bar/baz.html#Bullshit)")
@@ -85,7 +83,7 @@ mod test {
         let text = String::from("foo");
         let rel_path = String::from("foo/bar/index");
 
-        let out = MdRenderer::new().render_reference(Some(text), &PathBuf::from(""), rel_path)?;
+        let out = MdRenderer::new().render_reference(Some(text), &PathBuf::from(""), rel_path);
         assert_eq!(out, String::from("[foo](foo/bar/index.md)"));
         Ok(())
     }

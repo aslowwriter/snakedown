@@ -1,6 +1,5 @@
 use std::path::{Path, PathBuf};
 
-use color_eyre::Result;
 use url::Url;
 
 use crate::render::formats::Renderer;
@@ -28,7 +27,7 @@ impl Renderer for ZolaRenderer {
         display_text: Option<String>,
         target_prefix: &Path,
         target: String,
-    ) -> Result<String> {
+    ) -> String {
         let t = if Url::parse(&target).is_ok() {
             target
         } else {
@@ -41,11 +40,10 @@ impl Renderer for ZolaRenderer {
                     .display()
             )
         };
-        let rendered = match display_text {
+        match display_text {
             Some(text) => format!("[{text}]({t})"),
             None => format!("[{t}]({t})"),
-        };
-        Ok(rendered)
+        }
     }
     fn content_path(&self) -> Option<PathBuf> {
         Some(PathBuf::from("content"))
@@ -98,7 +96,7 @@ mod test {
                 Some("Baz".to_string()),
                 &PathBuf::from(""),
                 String::from("foo.bar.baz.index")
-            )?,
+            ),
             expected
         );
         Ok(())
@@ -111,7 +109,7 @@ mod test {
                 &PathBuf::from(""),
                 "https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset"
                     .to_string(),
-            )?,
+            ),
             r#"[Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset)"#
         );
         Ok(())
