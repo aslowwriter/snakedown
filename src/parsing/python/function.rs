@@ -2,25 +2,20 @@ use rustpython_parser::ast::{
     Arguments, Expr, Stmt, StmtAsyncFunctionDef, StmtFunctionDef, TypeParam,
 };
 
-use crate::indexing::object_ref::{ObjectRef, extract_object_refs};
+use crate::indexing::content::ContentNode;
 
 use super::utils::extract_docstring_from_body;
 
 #[derive(Debug, Clone)]
 pub struct FunctionDocumentation {
     pub name: String,
-    pub docstring: Option<String>,
+    pub docstring: Option<Vec<ContentNode>>,
     pub return_type: Option<Expr>,
     pub args: Arguments,
     pub generics: Vec<TypeParam>,
 }
 
 impl FunctionDocumentation {
-    pub fn extract_used_references(&self) -> Option<(String, Vec<ObjectRef>)> {
-        self.docstring
-            .as_ref()
-            .map(|s| (s.clone(), extract_object_refs(s)))
-    }
     pub fn from_statements(value: &Stmt, body_indent_level: usize) -> Option<Self> {
         match value {
             Stmt::AsyncFunctionDef(stmt_async_function_def) => {
@@ -44,8 +39,7 @@ impl FunctionDocumentation {
     ) -> Self {
         Self {
             name: value.name.to_string(),
-            docstring: extract_docstring_from_body(&value.body, body_indent_level)
-                .map(|s| s.trim().to_string()),
+            docstring: extract_docstring_from_body(&value.body, body_indent_level),
             return_type: value.returns.as_ref().map(|r| *r.clone()),
             args: *value.args.clone(),
             generics: value.type_params.clone(),
@@ -54,8 +48,7 @@ impl FunctionDocumentation {
     pub fn from_function_statements(value: &StmtFunctionDef, body_indent_level: usize) -> Self {
         Self {
             name: value.name.to_string(),
-            docstring: extract_docstring_from_body(&value.body, body_indent_level)
-                .map(|s| s.trim().to_string()),
+            docstring: extract_docstring_from_body(&value.body, body_indent_level),
             return_type: value.returns.as_ref().map(|r| *r.clone()),
             args: *value.args.clone(),
             generics: value.type_params.clone(),
@@ -70,6 +63,7 @@ pub fn is_private_function(fn_doc: &FunctionDocumentation) -> bool {
 #[cfg(test)]
 mod test {
 
+    use crate::parsing::python::function::ContentNode;
     use color_eyre::Result;
 
     use crate::parsing::{
@@ -83,15 +77,13 @@ def is_odd(i):
         "
     }
     fn test_python_async_func_no_types() -> &'static str {
-        "
-async def is_odd(i):
+        "async def is_odd(i):
     return bool(i & 1)
         "
     }
 
     fn test_python_async_func_docstring() -> &'static str {
-        "
-async def is_odd(i):
+        "async def is_odd(i):
     '''
     Determine whether a number is odd.
 
@@ -103,8 +95,7 @@ async def is_odd(i):
         "
     }
     fn test_python_func_docstring() -> &'static str {
-        "
-def is_odd(i):
+        "def is_odd(i):
     '''
     Determine whether a number is odd.
 
@@ -232,13 +223,15 @@ def return_none(foo: str, bar, *args, unused: Dict[Any, str] = None) -> 4+9:
         let docstring = function.docstring.clone();
         assert_eq!(
             docstring,
-            Some(String::from(
-                r"Determine whether a number is odd.
+            Some(vec![ContentNode::Text(String::from(
+                r"
+Determine whether a number is odd.
 
 Returns
 -------
-    bool: True iff input number is odd"
-            ))
+    bool: True iff input number is odd
+"
+            ))])
         );
         Ok(())
     }
@@ -253,13 +246,15 @@ Returns
         let docstring = function.docstring.clone();
         assert_eq!(
             docstring,
-            Some(String::from(
-                r"Determine whether a number is odd.
+            Some(vec![ContentNode::Text(String::from(
+                r"
+Determine whether a number is odd.
 
 Returns
 -------
-    bool: True iff input number is odd"
-            ))
+    bool: True iff input number is odd
+"
+            ))])
         );
         Ok(())
     }

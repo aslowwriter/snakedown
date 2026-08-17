@@ -17,6 +17,7 @@ use args::render_args;
 use expr::render_expr;
 
 use crate::{
+    indexing::content::ContentNode,
     parsing::{
         ObjectDocumentation,
         python::{
@@ -100,7 +101,18 @@ pub fn render_module<R: Renderer>(
     let front_matter = &renderer.render_front_matter(Some(&fully_qualified_name));
     local_ctx.insert("SNAKEDOWN_FRONT_MATTER", &front_matter);
 
-    if let Some(docstring) = mod_doc.docstring.clone() {
+    if let Some(docstring_nodes) = mod_doc.docstring.clone() {
+        let docstring = docstring_nodes
+            .into_iter()
+            .map(|node: ContentNode| match node {
+                ContentNode::Text(t) => t,
+                ContentNode::Reference(user_reference) => renderer.render_reference(
+                    user_reference.fully_qualified_name,
+                    user_reference.display_text,
+                ),
+            })
+            .collect::<Vec<_>>()
+            .join("");
         local_ctx.insert("SNAKEDOWN_MODULE_DOCSTRING", docstring.trim());
     }
 
@@ -123,7 +135,18 @@ fn render_class_docs<R: Renderer>(
     let front_matter = &renderer.render_front_matter(Some(fully_qualified_name));
     local_ctx.insert("SNAKEDOWN_FRONT_MATTER", &front_matter);
 
-    if let Some(docstring) = class_docs.docstring.clone() {
+    if let Some(docstring_nodes) = class_docs.docstring.clone() {
+        let docstring = docstring_nodes
+            .into_iter()
+            .map(|node: ContentNode| match node {
+                ContentNode::Text(t) => t,
+                ContentNode::Reference(user_reference) => renderer.render_reference(
+                    user_reference.fully_qualified_name,
+                    user_reference.display_text,
+                ),
+            })
+            .collect::<Vec<_>>()
+            .join("");
         local_ctx.insert("SNAKEDOWN_CLASS_DOCSTRING", docstring.trim());
     }
 
@@ -155,7 +178,18 @@ fn render_function_docs<R: Renderer>(
         local_ctx.insert("SNAKEDOWN_FUNCTION_RET", &render_expr(ret));
     }
 
-    if let Some(docstring) = fn_docs.docstring.clone() {
+    if let Some(docstring_nodes) = fn_docs.docstring.clone() {
+        let docstring = docstring_nodes
+            .into_iter()
+            .map(|node: ContentNode| match node {
+                ContentNode::Text(t) => t,
+                ContentNode::Reference(user_reference) => renderer.render_reference(
+                    user_reference.fully_qualified_name,
+                    user_reference.display_text,
+                ),
+            })
+            .collect::<Vec<_>>()
+            .join("");
         local_ctx.insert("SNAKEDOWN_FUNCTION_DOCSTRING", docstring.trim());
     }
 
@@ -281,7 +315,7 @@ This is a module that is used to test snakedown.
         let rendered = render_module(
             &mod_documentation,
             String::from("snakedown"),
-            &ZolaRenderer {},
+            &ZolaRenderer::default(),
             &ctx,
         )?;
 

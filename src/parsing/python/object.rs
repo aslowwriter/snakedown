@@ -1,4 +1,4 @@
-use crate::indexing::object_ref::ObjectRef;
+use crate::indexing::content::ContentNode;
 
 use super::class::ClassDocumentation;
 use super::function::FunctionDocumentation;
@@ -12,7 +12,20 @@ pub enum ObjectDocumentation {
 }
 
 impl ObjectDocumentation {
-    pub fn docstring(&self) -> Option<String> {
+    pub fn docstring_mut(&mut self) -> Option<&mut Vec<ContentNode>> {
+        match self {
+            ObjectDocumentation::Module(module_documentation) => {
+                module_documentation.docstring.as_mut()
+            }
+            ObjectDocumentation::Class(class_documentation) => {
+                class_documentation.docstring.as_mut()
+            }
+            ObjectDocumentation::Function(function_documentation) => {
+                function_documentation.docstring.as_mut()
+            }
+        }
+    }
+    pub fn docstring(&self) -> Option<Vec<ContentNode>> {
         match self {
             ObjectDocumentation::Module(module_documentation) => {
                 module_documentation.docstring.clone()
@@ -22,33 +35,6 @@ impl ObjectDocumentation {
             }
             ObjectDocumentation::Function(function_documentation) => {
                 function_documentation.docstring.clone()
-            }
-        }
-    }
-    pub fn extract_used_references(&self) -> Option<(String, Vec<ObjectRef>)> {
-        match self {
-            ObjectDocumentation::Module(module_documentation) => {
-                module_documentation.extract_used_references()
-            }
-            ObjectDocumentation::Class(class_documentation) => {
-                class_documentation.extract_used_references()
-            }
-            ObjectDocumentation::Function(function_documentation) => {
-                function_documentation.extract_used_references()
-            }
-        }
-    }
-
-    pub(crate) fn replace_docstring(&mut self, object_docstring: Option<String>) {
-        match self {
-            ObjectDocumentation::Module(module_documentation) => {
-                module_documentation.docstring = object_docstring;
-            }
-            ObjectDocumentation::Class(class_documentation) => {
-                class_documentation.docstring = object_docstring;
-            }
-            ObjectDocumentation::Function(function_documentation) => {
-                function_documentation.docstring = object_docstring;
             }
         }
     }

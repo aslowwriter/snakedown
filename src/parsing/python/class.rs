@@ -1,13 +1,13 @@
 use rustpython_parser::ast::{Identifier, StmtClassDef};
 
-use crate::indexing::object_ref::{ObjectRef, extract_object_refs};
+use crate::indexing::content::ContentNode;
 
 use super::{function::FunctionDocumentation, utils::extract_docstring_from_body};
 
 #[derive(Debug, Clone)]
 pub struct ClassDocumentation {
     pub name: Identifier,
-    pub docstring: Option<String>,
+    pub docstring: Option<Vec<ContentNode>>,
     pub methods: Vec<FunctionDocumentation>,
 }
 
@@ -23,11 +23,6 @@ impl ClassDocumentation {
                 .collect(),
         }
     }
-    pub fn extract_used_references(&self) -> Option<(String, Vec<ObjectRef>)> {
-        self.docstring
-            .as_ref()
-            .map(|s| (s.clone(), extract_object_refs(s)))
-    }
 }
 
 pub fn is_private_class(class_doc: &ClassDocumentation) -> bool {
@@ -41,6 +36,7 @@ mod test {
     use color_eyre::Result;
     use std::{fs::File, io::Write};
 
+    use crate::indexing::content::ContentNode;
     use crate::parsing::{
         python::module::extract_module_documentation,
         python::utils::{parse_python_file, parse_python_str},
@@ -94,11 +90,16 @@ class Greeter:
 
         assert_eq!(
             docstring,
-            Some(String::from(
-                r"this is a class docstring.
+            Some(vec![ContentNode::Text(String::from(
+                r"
+this is a class docstring.
 
-    this line has exactly one indent!"
-            ))
+    this line has exactly one indent!
+
+
+
+"
+            ))])
         );
         Ok(())
     }

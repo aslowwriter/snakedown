@@ -1,3 +1,5 @@
+use crate::indexing::content::ContentNode;
+use crate::indexing::content::Reference;
 use crate::render_notebook;
 use crate::render_object;
 use crate::{
@@ -171,34 +173,40 @@ impl RawIndex {
         Ok(())
     }
 
-    pub fn validate_references(&self) -> Result<(), Vec<Report>> {
+    pub fn validate_references(&mut self) -> Result<(), Vec<Report>> {
         let mut errors: Vec<_> = Vec::new();
-        for (key, obj) in self.internal_object_store.iter() {
-            if let Some((_, used_references)) = obj.extract_used_references() {
-                for used_ref in used_references {
-                    if !self
-                        .internal_object_store
-                        .contains_key(&used_ref.fully_qualified_name)
-                        && !self
-                            .external_object_store
-                            .contains_key(&used_ref.fully_qualified_name)
-                    {
-                        let suggestion =
-                            self.suggest_reference(&used_ref.fully_qualified_name, 5, 5);
 
-                        if let Some(c) = suggestion {
-                            errors.push(eyre!(
-                                "unknown reference: {}, in object {} did you mean {}?",
-                                used_ref.fully_qualified_name,
-                                key,
-                                c
-                            ));
-                        } else {
-                            errors.push(eyre!(
-                                "unknown reference: {}, in object {}",
-                                used_ref.fully_qualified_name,
-                                key,
-                            ));
+        for (key, obj) in self.internal_object_store.iter() {
+            if let Some(docstring) = obj.docstring() {
+                for node in docstring {
+                    match node {
+                        ContentNode::Text(_) => continue,
+                        ContentNode::Reference(used_ref) => {
+                            if !self
+                                .internal_object_store
+                                .contains_key(&used_ref.fully_qualified_name)
+                                && !self
+                                    .external_object_store
+                                    .contains_key(&used_ref.fully_qualified_name)
+                            {
+                                let suggestion =
+                                    self.suggest_reference(&used_ref.fully_qualified_name, 5, 5);
+
+                                if let Some(c) = suggestion {
+                                    errors.push(eyre!(
+                                        "unknown reference: {}, in object {} did you mean {}?",
+                                        used_ref.fully_qualified_name,
+                                        key,
+                                        c
+                                    ));
+                                } else {
+                                    errors.push(eyre!(
+                                        "unknown reference: {}, in object {}",
+                                        used_ref.fully_qualified_name,
+                                        key,
+                                    ));
+                                }
+                            }
                         }
                     }
                 }
@@ -249,30 +257,46 @@ impl RawIndex {
     //TODO: This is not an efficient way to do this, but for the test cases it works,
     //at some point we should find a more high performance solution.
     // see: https://github.com/aslowwriter/snakedown/issues/55
-    pub fn pre_process<R: Renderer>(&mut self, render: R, site_rel_api_path: &Path) -> Result<()> {
-        for object in self.internal_object_store.values_mut() {
-            if let Some((mut object_docstring, used_references)) = object.extract_used_references()
-            {
-                for used_ref in used_references {
-                    let display_text = used_ref
-                        .clone()
-                        .display_text
-                        .or_else(|| Some(used_ref.fully_qualified_name.clone()));
-
-                    let target = self
-                        .external_object_store
-                        .get(&used_ref.fully_qualified_name)
-                        .map(|u| u.as_str().to_string())
-                        .unwrap_or_else(|| used_ref.fully_qualified_name.clone());
-
-                    let expanded_ref =
-                        render.render_reference(display_text, site_rel_api_path, target);
-                    object_docstring =
-                        object_docstring.replace(&used_ref.original(), &expanded_ref);
+    pub fn pre_process(&mut self) -> Result<()> {
+        let keys: Vec<_> = self.internal_object_store.keys().cloned().collect();
+        for key in keys {
+            // unwrap is safe here bc we just determined all keys previously, thus this
+            // should always be Some
+            #[allow(clippy::unwrap_used)]
+            let object = self.internal_object_store.get_mut(&key).unwrap();
+            if let Some(docstring_nodes) = object.docstring_mut() {
+                for node in docstring_nodes.iter_mut() {
+                    match node {
+                        ContentNode::Text(_) => (),
+                        ContentNode::Reference(used_ref) => {
+                            let display_text = used_ref
+                                .clone()
+                                .display_text
+                                .or_else(|| Some(used_ref.fully_qualified_name.clone()));
+                            let target = self
+                                .external_object_store
+                                .get(&used_ref.fully_qualified_name)
+                                .map(|u| u.as_str().to_string())
+                                .unwrap_or_else(|| used_ref.fully_qualified_name.clone());
+                            let expanded_ref = Reference::new(target, display_text);
+                            *node = ContentNode::Reference(expanded_ref);
+                        }
+                    }
                 }
-                object.replace_docstring(Some(object_docstring));
             }
         }
+        // for object in  {
+        //     if let Some((mut object_docstring, used_references)) = object.extract_used_references()
+        //     {
+        //         for used_ref in used_references {
+        //
+        //
+        //             object_docstring =
+        //                 object_docstring.replace(&used_ref.original(), &expanded_ref);
+        //         }
+        //         object.replace_docstring(Some(object_docstring));
+        //     }
+        // }
 
         Ok(())
     }

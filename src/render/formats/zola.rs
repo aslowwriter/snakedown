@@ -1,11 +1,13 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use url::Url;
 
 use crate::render::formats::Renderer;
 
 #[derive(Default)]
-pub struct ZolaRenderer {}
+pub struct ZolaRenderer {
+    pub rel_path_to_api: PathBuf,
+}
 
 impl Renderer for ZolaRenderer {
     fn render_header(&self, content: &str, level: usize) -> String {
@@ -22,19 +24,14 @@ impl Renderer for ZolaRenderer {
         out
     }
 
-    fn render_reference(
-        &self,
-        display_text: Option<String>,
-        target_prefix: &Path,
-        target: String,
-    ) -> String {
+    fn render_reference(&self, target: String, display_text: Option<String>) -> String {
         let t = if Url::parse(&target).is_ok() {
             target
         } else {
             format!(
                 "{}",
                 PathBuf::from("@")
-                    .join(target_prefix)
+                    .join(self.rel_path_to_api.clone())
                     .join(target)
                     .with_added_extension("md")
                     .display()
@@ -65,7 +62,7 @@ mod test {
 
     #[test]
     fn test_zola_header() -> Result<()> {
-        let renderer = ZolaRenderer {};
+        let renderer = ZolaRenderer::default();
         let obj_name = String::from("foo.bar.nasty-names_with_underscores_and_emoji_🙈");
         assert_eq!(
             renderer.render_header(&obj_name, 2),
@@ -77,7 +74,7 @@ mod test {
     #[test]
     fn test_empty_zola_front_matter() -> Result<()> {
         assert_eq!(
-            ZolaRenderer {}.render_front_matter(None),
+            ZolaRenderer::default().render_front_matter(None),
             r"+++
 +++"
         );
@@ -92,11 +89,8 @@ mod test {
         let expected = r#"[Baz](@/foo.bar.baz.index.md)"#;
 
         assert_eq!(
-            ZolaRenderer {}.render_reference(
-                Some("Baz".to_string()),
-                &PathBuf::from(""),
-                String::from("foo.bar.baz.index")
-            ),
+            ZolaRenderer::default()
+                .render_reference(String::from("foo.bar.baz.index"), Some("Baz".to_string()),),
             expected
         );
         Ok(())
@@ -104,11 +98,10 @@ mod test {
     #[test]
     fn zola_external_link_no_shortcode() -> Result<()> {
         assert_eq!(
-            ZolaRenderer {}.render_reference(
-                Some("Dataset".to_string()),
-                &PathBuf::from(""),
+            ZolaRenderer::default().render_reference(
                 "https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset"
                     .to_string(),
+                Some("Dataset".to_string()),
             ),
             r#"[Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset)"#
         );
@@ -117,7 +110,7 @@ mod test {
     #[test]
     fn test_zola_front_matter_with_title() -> Result<()> {
         assert_eq!(
-            ZolaRenderer {}.render_front_matter(Some("foo")),
+            ZolaRenderer::default().render_front_matter(Some("foo")),
             r#"+++
 title = "foo"
 +++"#

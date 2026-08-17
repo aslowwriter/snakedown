@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use color_eyre::{Result, eyre::eyre};
 use rustpython_parser::ast::{Mod, Stmt, StmtAssign};
 
-use crate::indexing::object_ref::{ObjectRef, extract_object_refs};
+use crate::indexing::content::ContentNode;
 
 use super::{
     class::{ClassDocumentation, is_private_class},
@@ -13,19 +13,11 @@ use super::{
 
 #[derive(Default, Debug, Clone)]
 pub struct ModuleDocumentation {
-    pub docstring: Option<String>,
+    pub docstring: Option<Vec<ContentNode>>,
     pub functions: Vec<FunctionDocumentation>,
     pub classes: Vec<ClassDocumentation>,
     pub sub_modules: Option<Vec<PathBuf>>,
     pub exports: Option<Vec<String>>,
-}
-
-impl ModuleDocumentation {
-    pub fn extract_used_references(&self) -> Option<(String, Vec<ObjectRef>)> {
-        self.docstring
-            .as_ref()
-            .map(|s| (s.clone(), extract_object_refs(s)))
-    }
 }
 
 // just a conveneience function so we don't have to worry about
