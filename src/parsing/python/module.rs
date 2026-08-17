@@ -20,12 +20,6 @@ pub struct ModuleDocumentation {
     pub exports: Option<Vec<String>>,
 }
 
-#[derive(Debug)]
-pub struct ModuleReference {
-    pub name: String,
-    pub path: PathBuf,
-}
-
 impl ModuleDocumentation {
     pub fn extract_used_references(&self) -> Option<(String, Vec<ObjectRef>)> {
         self.docstring
