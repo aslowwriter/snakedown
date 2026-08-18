@@ -44,6 +44,7 @@ pub struct Config {
     pub notebook_path: Option<PathBuf>,
     pub skip_write: bool,
     pub offline: bool,
+    pub permissive: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Default, Clone)]
@@ -71,6 +72,7 @@ pub struct ConfigBuilder {
     notebook_path: Option<PathBuf>,
     skip_write: Option<bool>,
     offline: Option<bool>,
+    permissive: Option<bool>,
 }
 
 impl ConfigBuilder {
@@ -230,6 +232,7 @@ impl ConfigBuilder {
             notebook_path: self.notebook_path,
             skip_write: self.skip_write.unwrap_or(false),
             offline: self.offline.unwrap_or(false),
+            permissive: self.permissive.unwrap_or(false),
         })
     }
 
