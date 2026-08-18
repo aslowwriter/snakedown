@@ -1,4 +1,3 @@
-use lazy_regex::regex_replace_all;
 use std::{
     ffi::{OsStr, OsString},
     fs::{File, create_dir_all, exists},
@@ -102,7 +101,7 @@ pub fn import_components_from_fs_path(pkg_root: &Path, module_path: &Path) -> Re
                 .to_str()
                 // python name normalisation
                 // see https://packaging.python.org/en/latest/specifications/name-normalization/
-                .map(|s| String::from(regex_replace_all!(r"[-.]+", &s.to_lowercase(), "-")))
+                .map(|s| String::from(&s.to_lowercase().replace("_", "-")))
                 .ok_or_eyre("error converting path component to UTF-8")
         })
         .collect::<Result<Vec<String>>>()?;
