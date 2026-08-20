@@ -5,9 +5,6 @@ use std::{
 
 use color_eyre::Result;
 
-/// `$HOME/.snakedown/cache` if $HOME exists and `./.shakedown/cache` else
-// TODO: start tying different combinations of XDG_CACHE_HOME and APPDIR where appropriate
-// see also: https://github.com/aslowwriter/snakedown/issues/56
 pub fn get_cache_path() -> PathBuf {
     PathBuf::from(".").join(".snakedown").join("cache")
 }

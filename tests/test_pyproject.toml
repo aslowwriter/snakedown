@@ -215,7 +215,6 @@ filterwarnings = [
 ]
 
 [tool.mypy]
-# TODO: Re-enable the tests
 exclude                = ["docs/.*", "tests/.*"]
 plugins                = ["pydantic.mypy", "numpy.typing.mypy_plugin"]
 python_version         = "3.11"
