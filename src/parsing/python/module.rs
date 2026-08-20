@@ -3,14 +3,21 @@ use std::path::PathBuf;
 use color_eyre::{Result, eyre::eyre};
 use rustpython_parser::ast::{Mod, Stmt, StmtAssign};
 
-use crate::indexing::content::ContentNode;
+use crate::indexing::{content::ContentNode, validated::ValidatedContentNode};
 
 use super::{
     class::{ClassDocumentation, is_private_class},
     function::{FunctionDocumentation, is_private_function},
     utils::extract_docstring_from_body,
 };
-
+#[derive(Default, Debug, Clone)]
+pub struct ValidatedModuleDocumentation {
+    pub docstring: Option<Vec<ValidatedContentNode>>,
+    pub functions: Vec<String>,
+    pub classes: Vec<String>,
+    pub sub_modules: Option<Vec<String>>,
+    pub exports: Option<Vec<String>>,
+}
 #[derive(Default, Debug, Clone)]
 pub struct ModuleDocumentation {
     pub docstring: Option<Vec<ContentNode>>,

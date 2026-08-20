@@ -24,16 +24,13 @@ impl Renderer for MdRenderer {
         }
     }
 
-    fn render_reference(&self, target: String, display_text: Option<String>) -> String {
+    fn render_reference(&self, target: String, display_text: String) -> String {
         let t = if Url::parse(&target).is_ok() {
             target
         } else {
             format!("{}.md", target)
         };
-        match display_text {
-            Some(text) => format!("[{text}]({t})"),
-            None => format!("[{t}]({t})"),
-        }
+        format!("[{display_text}]({t})")
     }
 
     fn content_path(&self) -> Option<PathBuf> {
@@ -65,7 +62,7 @@ mod test {
     fn test_render_external_ref() -> Result<()> {
         let text = String::from("foo");
         let url = String::from("https://example.com/docs/foo/bar/baz.html#Bullshit");
-        let out = MdRenderer::new().render_reference(url, Some(text));
+        let out = MdRenderer::new().render_reference(url, text);
         assert_eq!(
             out,
             String::from("[foo](https://example.com/docs/foo/bar/baz.html#Bullshit)")
@@ -77,7 +74,7 @@ mod test {
         let text = String::from("foo");
         let rel_path = String::from("foo/bar/index");
 
-        let out = MdRenderer::new().render_reference(rel_path, Some(text));
+        let out = MdRenderer::new().render_reference(rel_path, text);
         assert_eq!(out, String::from("[foo](foo/bar/index.md)"));
         Ok(())
     }

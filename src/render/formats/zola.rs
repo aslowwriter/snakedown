@@ -24,7 +24,7 @@ impl Renderer for ZolaRenderer {
         out
     }
 
-    fn render_reference(&self, target: String, display_text: Option<String>) -> String {
+    fn render_reference(&self, target: String, display_text: String) -> String {
         let t = if Url::parse(&target).is_ok() {
             target
         } else {
@@ -37,10 +37,7 @@ impl Renderer for ZolaRenderer {
                     .display()
             )
         };
-        match display_text {
-            Some(text) => format!("[{text}]({t})"),
-            None => format!("[{t}]({t})"),
-        }
+        format!("[{display_text}]({t})")
     }
     fn content_path(&self) -> Option<PathBuf> {
         Some(PathBuf::from("content"))
@@ -90,7 +87,7 @@ mod test {
 
         assert_eq!(
             ZolaRenderer::default()
-                .render_reference(String::from("foo.bar.baz.index"), Some("Baz".to_string()),),
+                .render_reference(String::from("foo.bar.baz.index"), "Baz".to_string(),),
             expected
         );
         Ok(())
@@ -101,7 +98,7 @@ mod test {
             ZolaRenderer::default().render_reference(
                 "https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset"
                     .to_string(),
-                Some("Dataset".to_string()),
+                "Dataset".to_string(),
             ),
             r#"[Dataset](https://docs.xarray.dev/en/stable/generated/xarray.Dataset.html#xarray.Dataset)"#
         );

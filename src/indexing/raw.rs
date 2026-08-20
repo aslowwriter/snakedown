@@ -1,9 +1,6 @@
-use crate::indexing::content::ContentNode;
-use crate::indexing::content::Reference;
-use crate::render_notebook;
-use crate::render_object;
 use crate::{
     config::ExternalIndex,
+    indexing::validated::{InvalidReference, ValidatedIndex},
     parsing::{
         ObjectDocumentation,
         python::{
@@ -14,31 +11,18 @@ use crate::{
             utils::parse_python_file,
         },
     },
-    render::formats::Renderer,
     should_include_reference,
 };
-use color_eyre::{Report, Result, eyre::eyre};
+use color_eyre::{Result, eyre::eyre};
 use edit_distance::edit_distance;
 use nbformat::v4::Cell;
 use sphinx_inv::SphinxInventoryReader;
-use std::fs::{File, create_dir_all};
-use std::io::Write;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-use tera::Context;
-use tracing::warn;
+use tracing::{info, warn};
 use url::Url;
-
-// TODO: I think the winning strategy here is to start with a `RawIndex` that is more or less the
-// current index struct, which refers to all the original python stuff on disk with all the type
-// info etc.
-// then we do something like `let serializable_index = index.process()?;` with something like
-// `RawIndex::process(self) -> SerializableIndex` which is a new object with everything
-// preprocessed, incl stripped prefixes, all references validated and expanded etc.
-// then later we can just write everything to disk separately. That's a nice separation of concerns
-// see also: https://github.com/aslowwriter/snakedown/issues/57
 
 #[derive(Debug)]
 pub struct RawIndex {
@@ -173,217 +157,9 @@ impl RawIndex {
         Ok(())
     }
 
-    pub fn validate_references(&mut self) -> Result<(), Vec<Report>> {
-        let mut errors: Vec<_> = Vec::new();
-
-        for (key, obj) in self.internal_object_store.iter() {
-            if let Some(docstring) = obj.docstring() {
-                for node in docstring {
-                    match node {
-                        ContentNode::Text(_) => continue,
-                        ContentNode::Reference(used_ref) => {
-                            if !self
-                                .internal_object_store
-                                .contains_key(&used_ref.fully_qualified_name)
-                                && !self
-                                    .external_object_store
-                                    .contains_key(&used_ref.fully_qualified_name)
-                            {
-                                let suggestion =
-                                    self.suggest_reference(&used_ref.fully_qualified_name, 5, 5);
-
-                                if let Some(c) = suggestion {
-                                    errors.push(eyre!(
-                                        "unknown reference: {}, in object {} did you mean {}?",
-                                        used_ref.fully_qualified_name,
-                                        key,
-                                        c
-                                    ));
-                                } else {
-                                    errors.push(eyre!(
-                                        "unknown reference: {}, in object {}",
-                                        used_ref.fully_qualified_name,
-                                        key,
-                                    ));
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-        }
-
-        if errors.is_empty() {
-            Ok(())
-        } else {
-            Err(errors)
-        }
-    }
-
-    fn suggest_reference(
-        &self,
-        unknown_reference: &str,
-        max_length_distance: usize,
-        max_edit_distance: usize,
-    ) -> Option<String> {
-        let best_internal_candidate = suggest_known_alternative(
-            unknown_reference,
-            self.internal_object_store.keys().cloned().collect(),
-            max_length_distance,
-            max_edit_distance,
-        );
-        let best_external_candidate = suggest_known_alternative(
-            unknown_reference,
-            self.external_object_store.keys().cloned().collect(),
-            max_length_distance,
-            max_edit_distance,
-        );
-        match (best_internal_candidate, best_external_candidate) {
-            (None, None) => None,
-            (None, Some((external, _score))) => Some(external.clone()),
-            (Some((internal, _score)), None) => Some(internal.clone()),
-            // very unlikely to happen, but just in case, we'll prefer
-            // suggesting internal references
-            (Some((internal, internal_score)), Some((external, external_score))) => {
-                if external_score > internal_score {
-                    Some(external.clone())
-                } else {
-                    Some(internal.clone())
-                }
-            }
-        }
-    }
-
-    //TODO: This is not an efficient way to do this, but for the test cases it works,
-    //at some point we should find a more high performance solution.
-    // see: https://github.com/aslowwriter/snakedown/issues/55
-    pub fn pre_process(&mut self) -> Result<()> {
-        let keys: Vec<_> = self.internal_object_store.keys().cloned().collect();
-        for key in keys {
-            // unwrap is safe here bc we just determined all keys previously, thus this
-            // should always be Some
-            #[allow(clippy::unwrap_used)]
-            let object = self.internal_object_store.get_mut(&key).unwrap();
-            if let Some(docstring_nodes) = object.docstring_mut() {
-                for node in docstring_nodes.iter_mut() {
-                    match node {
-                        ContentNode::Text(_) => (),
-                        ContentNode::Reference(used_ref) => {
-                            let display_text = used_ref
-                                .clone()
-                                .display_text
-                                .or_else(|| Some(used_ref.fully_qualified_name.clone()));
-                            let target = self
-                                .external_object_store
-                                .get(&used_ref.fully_qualified_name)
-                                .map(|u| u.as_str().to_string())
-                                .unwrap_or_else(|| used_ref.fully_qualified_name.clone());
-                            let expanded_ref = Reference::new(target, display_text);
-                            *node = ContentNode::Reference(expanded_ref);
-                        }
-                    }
-                }
-            }
-        }
-        // for object in  {
-        //     if let Some((mut object_docstring, used_references)) = object.extract_used_references()
-        //     {
-        //         for used_ref in used_references {
-        //
-        //
-        //             object_docstring =
-        //                 object_docstring.replace(&used_ref.original(), &expanded_ref);
-        //         }
-        //         object.replace_docstring(Some(object_docstring));
-        //     }
-        // }
-
-        Ok(())
-    }
-
-    fn serialize_pages<R: Renderer>(
-        &self,
-        renderer: &R,
-        ctx: &Context,
-        out_api_path: &Path,
-        skip_write: bool,
-    ) -> Result<()> {
-        if !skip_write {
-            create_dir_all(out_api_path)?;
-        }
-
-        for (key, object) in self.internal_object_store.iter() {
-            let file_path = out_api_path.join(key).with_added_extension("md");
-            let rendered = render_object(object, key.clone(), &renderer, ctx)?;
-            let rendered_trimmed = rendered.trim_start();
-            if !skip_write {
-                let mut file = File::create(file_path)?;
-                file.write_all(rendered_trimmed.as_bytes())?;
-            }
-        }
-
-        if let Some((index_file_path, index_file_content)) =
-            &renderer.index_file(Some("API".to_string()))
-            && !skip_write
-        {
-            let mut file = File::create(out_api_path.join(index_file_path))?;
-            file.write_all(index_file_content.as_bytes())?;
-        }
-        Ok(())
-    }
-
-    fn serialize_notebooks<R: Renderer>(
-        &self,
-        notebook_out_path: &Path,
-        renderer: &R,
-        skip_write: bool,
-    ) -> Result<()> {
-        if !skip_write {
-            create_dir_all(notebook_out_path)?;
-        }
-        for (key, cells) in self.notebook_store.iter() {
-            let dir_path = notebook_out_path.join(key);
-            let file_path = dir_path.clone().join("index").with_added_extension("md");
-            let mut rendered = render_notebook(
-                dir_path
-                    .file_stem()
-                    .map(|p| p.display().to_string())
-                    .as_deref(),
-                cells,
-                &renderer,
-            )?;
-            // some tools insert an extra EOL at the end of the file
-            if !rendered.text.ends_with("\n") {
-                rendered.text.push('\n');
-            }
-
-            if !skip_write {
-                create_dir_all(dir_path.clone())?;
-                let mut file = File::create(file_path)?;
-                file.write_all(rendered.text.as_bytes())?;
-                for img in rendered.images {
-                    let mut img_file = File::create(dir_path.join(img.name))?;
-                    img_file.write_all(&img.data)?;
-                }
-            }
-        }
-
-        Ok(())
-    }
-
-    pub fn serialize<R: Renderer>(
-        self,
-        renderer: &R,
-        ctx: &Context,
-        out_api_path: &Path,
-        notebook_out_path: Option<&Path>,
-        skip_write: bool,
-    ) -> Result<()> {
-        self.serialize_pages(renderer, ctx, out_api_path, skip_write)?;
-        if let Some(notebook_out_path) = &notebook_out_path {
-            self.serialize_notebooks(notebook_out_path, renderer, skip_write)?;
-        }
-        Ok(())
+    pub fn validate(self) -> (ValidatedIndex, HashMap<String, Vec<InvalidReference>>) {
+        info!("validating references");
+        ValidatedIndex::from_raw(self)
     }
 }
 

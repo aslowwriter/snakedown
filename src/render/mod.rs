@@ -2,7 +2,6 @@ pub mod args;
 pub mod expr;
 pub mod formats;
 pub mod jupyter;
-use color_eyre::Result;
 
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
@@ -17,11 +16,12 @@ use args::render_args;
 use expr::render_expr;
 
 use crate::{
-    indexing::content::ContentNode,
+    indexing::validated::ValidatedContentNode,
     parsing::{
         ObjectDocumentation,
         python::{
-            class::ClassDocumentation, function::FunctionDocumentation, module::ModuleDocumentation,
+            class::ValidatedClassDocumentation, function::ValidatedFunctionDocumentation,
+            module::ValidatedModuleDocumentation, object::ValidatedObjectDocumentation,
         },
     },
     render::formats::Renderer,
@@ -63,39 +63,30 @@ pub fn fully_qualified_object_name(object: &ObjectDocumentation, prefix: Option<
 }
 
 pub fn render_object<R: Renderer>(
-    object: &ObjectDocumentation,
+    object: &ValidatedObjectDocumentation,
     fully_qualified_name: String,
     renderer: &R,
     ctx: &Context,
-) -> Result<String> {
+) -> String {
     match object {
-        ObjectDocumentation::Class(class_documentation) => Ok(render_class_docs(
-            class_documentation,
-            &fully_qualified_name,
-            renderer,
-            ctx,
-        )?),
-        ObjectDocumentation::Module(module_documentation) => Ok(render_module(
-            module_documentation,
-            fully_qualified_name,
-            renderer,
-            ctx,
-        )?),
-        ObjectDocumentation::Function(function_documentation) => Ok(render_function_docs(
-            function_documentation,
-            &fully_qualified_name,
-            renderer,
-            ctx,
-        )?),
+        ValidatedObjectDocumentation::Class(class_documentation) => {
+            render_class_docs(class_documentation, &fully_qualified_name, renderer, ctx)
+        }
+        ValidatedObjectDocumentation::Module(module_documentation) => {
+            render_module(module_documentation, fully_qualified_name, renderer, ctx)
+        }
+        ValidatedObjectDocumentation::Function(function_documentation) => {
+            render_function_docs(function_documentation, &fully_qualified_name, renderer, ctx)
+        }
     }
 }
 
 pub fn render_module<R: Renderer>(
-    mod_doc: &ModuleDocumentation,
+    mod_doc: &ValidatedModuleDocumentation,
     fully_qualified_name: String,
     renderer: &R,
     ctx: &Context,
-) -> Result<String> {
+) -> String {
     let mut local_ctx = ctx.clone();
 
     let front_matter = &renderer.render_front_matter(Some(&fully_qualified_name));
@@ -104,12 +95,12 @@ pub fn render_module<R: Renderer>(
     if let Some(docstring_nodes) = mod_doc.docstring.clone() {
         let docstring = docstring_nodes
             .into_iter()
-            .map(|node: ContentNode| match node {
-                ContentNode::Text(t) => t,
-                ContentNode::Reference(user_reference) => renderer.render_reference(
-                    user_reference.fully_qualified_name,
-                    user_reference.display_text,
-                ),
+            .map(|node| match node {
+                ValidatedContentNode::Text(t) => t,
+                ValidatedContentNode::ValidReference(reference) => {
+                    renderer.render_reference(reference.target, reference.display)
+                }
+                ValidatedContentNode::InvalidReference(invalid_ref) => invalid_ref.org,
             })
             .collect::<Vec<_>>()
             .join("");
@@ -121,15 +112,18 @@ pub fn render_module<R: Renderer>(
 {{SNAKEDOWN_MODULE_DOCSTRING}}
 {%endif%}"#;
 
-    Ok(Tera::one_off(function_template, &local_ctx, false)?)
+    // This template is always the same and so should never fail
+    // hence the expect is safe
+    #[allow(clippy::expect_used)]
+    Tera::one_off(function_template, &local_ctx, false).expect("Failed to render template")
 }
 
 fn render_class_docs<R: Renderer>(
-    class_docs: &ClassDocumentation,
+    class_docs: &ValidatedClassDocumentation,
     fully_qualified_name: &str,
     renderer: &R,
     ctx: &Context,
-) -> Result<String> {
+) -> String {
     let mut local_ctx = ctx.clone();
 
     let front_matter = &renderer.render_front_matter(Some(fully_qualified_name));
@@ -138,33 +132,35 @@ fn render_class_docs<R: Renderer>(
     if let Some(docstring_nodes) = class_docs.docstring.clone() {
         let docstring = docstring_nodes
             .into_iter()
-            .map(|node: ContentNode| match node {
-                ContentNode::Text(t) => t,
-                ContentNode::Reference(user_reference) => renderer.render_reference(
-                    user_reference.fully_qualified_name,
-                    user_reference.display_text,
-                ),
+            .map(|node| match node {
+                ValidatedContentNode::Text(t) => t,
+                ValidatedContentNode::ValidReference(user_reference) => {
+                    renderer.render_reference(user_reference.target, user_reference.display)
+                }
+                ValidatedContentNode::InvalidReference(invalid_ref) => invalid_ref.org,
             })
             .collect::<Vec<_>>()
             .join("");
         local_ctx.insert("SNAKEDOWN_CLASS_DOCSTRING", docstring.trim());
     }
 
-    let function_template = r#"
-        {{ SNAKEDOWN_FRONT_MATTER }}
+    let function_template = r#"{{ SNAKEDOWN_FRONT_MATTER }}
 {%if SNAKEDOWN_CLASS_DOCSTRING%}
 {{SNAKEDOWN_CLASS_DOCSTRING}}
 {%endif%}"#;
 
-    Ok(Tera::one_off(function_template, &local_ctx, false)?)
+    // This template is always the same and so should never fail
+    // hence the expect is safe
+    #[allow(clippy::expect_used)]
+    Tera::one_off(function_template, &local_ctx, false).expect("Failed to render template")
 }
 
 fn render_function_docs<R: Renderer>(
-    fn_docs: &FunctionDocumentation,
+    fn_docs: &ValidatedFunctionDocumentation,
     fully_qualified_name: &str,
     renderer: &R,
     ctx: &Context,
-) -> Result<String> {
+) -> String {
     let mut local_ctx = ctx.clone();
 
     let front_matter = &renderer.render_front_matter(Some(fully_qualified_name));
@@ -181,27 +177,29 @@ fn render_function_docs<R: Renderer>(
     if let Some(docstring_nodes) = fn_docs.docstring.clone() {
         let docstring = docstring_nodes
             .into_iter()
-            .map(|node: ContentNode| match node {
-                ContentNode::Text(t) => t,
-                ContentNode::Reference(user_reference) => renderer.render_reference(
-                    user_reference.fully_qualified_name,
-                    user_reference.display_text,
-                ),
+            .map(|node| match node {
+                ValidatedContentNode::Text(t) => t,
+                ValidatedContentNode::InvalidReference(invalid_ref) => invalid_ref.org,
+                ValidatedContentNode::ValidReference(user_reference) => {
+                    renderer.render_reference(user_reference.target, user_reference.display)
+                }
             })
             .collect::<Vec<_>>()
             .join("");
         local_ctx.insert("SNAKEDOWN_FUNCTION_DOCSTRING", docstring.trim());
     }
 
-    let function_template = r#"
-        {{ SNAKEDOWN_FRONT_MATTER }}
+    let function_template = r#"{{ SNAKEDOWN_FRONT_MATTER }}
 
 {{ SNAKEDOWN_FUNCTION_NAME }}({{ SNAKEDOWN_FUNCTION_ARGS }}){% if SNAKEDOWN_FUNCTION_RET %} -> {{ SNAKEDOWN_FUNCTION_RET }}{%endif%}
 {%if SNAKEDOWN_FUNCTION_DOCSTRING%}
 {{SNAKEDOWN_FUNCTION_DOCSTRING}}
 {%endif%}"#;
 
-    Ok(Tera::one_off(function_template, &local_ctx, false)?)
+    // This template is always the same and so should never fail
+    // hence the expect is safe
+    #[allow(clippy::expect_used)]
+    Tera::one_off(function_template, &local_ctx, false).expect("Failed to render template")
 }
 
 #[cfg(test)]
@@ -209,17 +207,22 @@ mod test {
 
     use std::path::PathBuf;
 
+    use crate::{
+        indexing::{content::ContentNode, validated::ValidatedContentNode},
+        parsing::python::{
+            module::{ValidatedModuleDocumentation, extract_module_documentation},
+            utils::parse_python_str,
+        },
+        render::{
+            formats::{md::MdRenderer, zola::ZolaRenderer},
+            translate_filename,
+        },
+        render_module,
+    };
     use color_eyre::Result;
     use pretty_assertions::assert_eq;
     use tera::Context;
 
-    use crate::{
-        parsing::{python::module::extract_module_documentation, python::utils::parse_python_str},
-        render::{
-            formats::{md::MdRenderer, zola::ZolaRenderer},
-            render_module, translate_filename,
-        },
-    };
     fn test_dirty_module_str() -> &'static str {
         r"'''This is a module that is used to test snakedown.'''
 
@@ -285,12 +288,37 @@ This is a module that is used to test snakedown.
         let mod_documentation = extract_module_documentation(&parsed, false, false);
         let ctx = Context::new();
 
+        let validated_mod_documentation = ValidatedModuleDocumentation {
+            docstring: mod_documentation.docstring.map(|v| {
+                v.iter()
+                    .map(|n| match n {
+                        ContentNode::Text(t) => ValidatedContentNode::Text(t.to_string()),
+                        ContentNode::Reference(_) => unreachable!(),
+                    })
+                    .collect()
+            }),
+            functions: mod_documentation
+                .functions
+                .iter()
+                .map(|f| f.name.to_string())
+                .collect(),
+            classes: mod_documentation
+                .classes
+                .iter()
+                .map(|f| f.name.to_string())
+                .collect(),
+            sub_modules: mod_documentation
+                .sub_modules
+                .map(|v| v.iter().map(|p| p.display().to_string()).collect()),
+            exports: mod_documentation.exports,
+        };
+
         let rendered = render_module(
-            &mod_documentation,
+            &validated_mod_documentation,
             String::from("snakedown.testing.test_module"),
             &MdRenderer::new(),
             &ctx,
-        )?;
+        );
 
         assert_eq!(rendered, expected_module_docs_rendered());
 
@@ -312,12 +340,36 @@ This is a module that is used to test snakedown.
         let mod_documentation = extract_module_documentation(&parsed, false, false);
         let ctx = Context::new();
 
+        let validated_mod_documentation = ValidatedModuleDocumentation {
+            docstring: mod_documentation.docstring.map(|v| {
+                v.iter()
+                    .map(|n| match n {
+                        ContentNode::Text(t) => ValidatedContentNode::Text(t.to_string()),
+                        ContentNode::Reference(_) => unreachable!(),
+                    })
+                    .collect()
+            }),
+            functions: mod_documentation
+                .functions
+                .iter()
+                .map(|f| f.name.to_string())
+                .collect(),
+            classes: mod_documentation
+                .classes
+                .iter()
+                .map(|f| f.name.to_string())
+                .collect(),
+            sub_modules: mod_documentation
+                .sub_modules
+                .map(|v| v.iter().map(|p| p.display().to_string()).collect()),
+            exports: mod_documentation.exports,
+        };
         let rendered = render_module(
-            &mod_documentation,
+            &validated_mod_documentation,
             String::from("snakedown"),
             &ZolaRenderer::default(),
             &ctx,
-        )?;
+        );
 
         assert_eq!(rendered, expected_module_docs_zola_rendered());
 

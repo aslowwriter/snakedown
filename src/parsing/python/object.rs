@@ -1,9 +1,18 @@
 use crate::indexing::content::ContentNode;
+use crate::parsing::python::class::ValidatedClassDocumentation;
+use crate::parsing::python::function::ValidatedFunctionDocumentation;
+use crate::parsing::python::module::ValidatedModuleDocumentation;
 
 use super::class::ClassDocumentation;
 use super::function::FunctionDocumentation;
 use super::module::ModuleDocumentation;
 
+#[derive(Debug)]
+pub enum ValidatedObjectDocumentation {
+    Module(ValidatedModuleDocumentation),
+    Class(ValidatedClassDocumentation),
+    Function(ValidatedFunctionDocumentation),
+}
 #[derive(Debug)]
 pub enum ObjectDocumentation {
     Module(ModuleDocumentation),
