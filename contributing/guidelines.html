@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-778d18de.js";
+            window.path_to_searchindex_js = "../searchindex-2137c2ad.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-6ac43af2.js"></script>
@@ -198,6 +198,10 @@ feel free to ask us for help! We might even suggest where it would work to be la
 <p>When in doubt, requesting early feedback is allowed and even encouraged.</p>
 <h2 id="coverage"><a class="header" href="#coverage">Coverage</a></h2>
 <p>Coverage in Rust can be a bit fineky at times, and additionally coverage doesn’t always tell the whole story, so we usually don’t enforce hard limits on coverage. For example llvm-cov marking a file that only contains a <code>)?</code> when returning a <code>Result</code> that will (almost) never error is not uncommon. We don’t think there’s much value in enforcing that these lines be covered, so if you miss those for example, that’s okay. That being said, we do like to keep our coverage high, so if you don’t cover something, please have good explanation as to why!</p>
+<h2 id="use-of-unwrap-et-al"><a class="header" href="#use-of-unwrap-et-al">Use of <code>.unwrap()</code> et al.</a></h2>
+<p>Having good error handling and reporting is very important to snakedown, and as such, use of <code>.unwrap</code>, <code>.expect</code>, <code>panic!()</code> etc, should be avoided whenever possible, so we have lints setup to disallow this.</p>
+<p>However, there are times when results are technically possible because of an API, but should never happen because we have verrifed the behaviour at compile. In these cases it is acceptable to use the unwrap and silence the warning with an attribute like <code>#[allow(clippy::unwrap_used)]</code> but if you do, please also add a comment explaining why this is always safe to do. In cases where a result might return an <code>Err</code> proper error handling should be used.</p>
+<p>An example of such a situation is for example if we collect all keys to a hashmap into a separate collection, and then immediately iterateing over those and getting the value mutably from the <code>HashMap</code> so we can mutate them without running into problems with the borrow checker. In this case, we can quite easily see that the indexing should always return <code>Some</code> even though the API returns an <code>Option</code>. In such a situation it is perfectly fine to use <code>.expect</code> and allow that instance.</p>
 <h2 id="organisation"><a class="header" href="#organisation">Organisation</a></h2>
 <p>For code organization, we recommend</p>
 <ul>
