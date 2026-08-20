@@ -1,6 +1,6 @@
 use rustpython_parser::ast::{Identifier, StmtClassDef};
 
-use crate::indexing::content::ContentNode;
+use crate::indexing::{content::ContentNode, validated::ValidatedContentNode};
 
 use super::{function::FunctionDocumentation, utils::extract_docstring_from_body};
 
@@ -9,6 +9,13 @@ pub struct ClassDocumentation {
     pub name: Identifier,
     pub docstring: Option<Vec<ContentNode>>,
     pub methods: Vec<FunctionDocumentation>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ValidatedClassDocumentation {
+    pub name: String,
+    pub docstring: Option<Vec<ValidatedContentNode>>,
+    pub method_names: Vec<String>,
 }
 
 impl ClassDocumentation {

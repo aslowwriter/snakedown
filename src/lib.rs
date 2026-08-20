@@ -11,10 +11,9 @@ use crate::fs::{crawl_notebooks, crawl_package};
 pub use crate::fs::{get_module_name, get_package_modules, walk_package};
 use crate::indexing::external::cache::init_cache;
 use crate::indexing::external::fetch::fill_cache;
-use crate::indexing::index::RawIndex;
+use crate::indexing::raw::RawIndex;
 use crate::render::formats::Renderer;
 pub use crate::render::render_module;
-use crate::render::{jupyter::render_notebook, render_object};
 
 use sphinx_inv::{SphinxReference, SphinxType, StdRole};
 
@@ -69,16 +68,29 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
         crawl_notebooks(&mut index, nb_path)?;
     }
 
-    match index.validate_references() {
-        Ok(_) => Ok(()),
-        Err(errors) => Err(eyre!(
-            "Found {} invalid references(s):\n{:?}",
-            errors.len(),
-            errors
-        )),
-    }?;
-
-    index.pre_process()?;
+    let (validated_index, invalid_references) = index.validate();
+    if !invalid_references.is_empty() {
+        Err(eyre!(
+            "Found invalid reference(s) in following object(s):\n\n{}",
+            invalid_references
+                .iter()
+                .map(|(obj, invalids)| format!(
+                    "{}:\n{}",
+                    obj,
+                    invalids
+                        .iter()
+                        .map(|invalid| match invalid.suggestions.clone() {
+                            None => format!("    - {}", invalid.org),
+                            Some(suggestion) =>
+                                format!("    - {}, did you mean {}?", invalid.org, suggestion),
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n")
+                ))
+                .collect::<Vec<_>>()
+                .join("\n")
+        ))?;
+    }
 
     // even though notebook_path itself isn't part of the computation
     // it is still the start of the chain bc if that one is none the rest
@@ -92,13 +104,11 @@ pub async fn render_docs(config_builder: ConfigBuilder) -> Result<Vec<PathBuf>> 
         )
     });
 
-    index.serialize(
-        &config.renderer,
-        &ctx,
-        &out_api_path,
-        nb_out_path.as_deref(),
-        config.skip_write,
-    )?;
+    let serializable_index = validated_index.render(&config.renderer, &ctx, nb_out_path.as_deref());
+
+    if !config.skip_write {
+        serializable_index.serialize(&out_api_path, nb_out_path)?;
+    }
 
     Ok(errored)
 }
@@ -443,9 +453,9 @@ mod test {
             Ok(_) => bail!("render_docs did not exit with an error"),
             Err(e) => {
                 let err_msg = format!("{:?}", e);
-                assert!(err_msg.contains("test_pkg.bar.great, in object test_pkg.miss_spelled_ref.the_little_function_that_could did you mean test_pkg.bar.greet?"));
-                assert!(err_msg.contains("unknown reference: nimpy.fft, in object test_pkg.miss_spelled_ref.the_little_function_that_could did you mean numpy.fft?"));
-                assert!(err_msg.contains("unknown reference: asdfasdfasdf, in object test_pkg.miss_spelled_ref.the_little_function_that_could"));
+                assert!(err_msg.contains("test_pkg.bar.great, did you mean test_pkg.bar.greet?"));
+                assert!(err_msg.contains("nimpy.fft, did you mean numpy.fft?"));
+                assert!(err_msg.contains("asdfasdfasdf"));
             }
         }
 

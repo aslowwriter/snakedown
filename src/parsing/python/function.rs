@@ -2,7 +2,7 @@ use rustpython_parser::ast::{
     Arguments, Expr, Stmt, StmtAsyncFunctionDef, StmtFunctionDef, TypeParam,
 };
 
-use crate::indexing::content::ContentNode;
+use crate::indexing::{content::ContentNode, validated::ValidatedContentNode};
 
 use super::utils::extract_docstring_from_body;
 
@@ -10,6 +10,15 @@ use super::utils::extract_docstring_from_body;
 pub struct FunctionDocumentation {
     pub name: String,
     pub docstring: Option<Vec<ContentNode>>,
+    pub return_type: Option<Expr>,
+    pub args: Arguments,
+    pub generics: Vec<TypeParam>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ValidatedFunctionDocumentation {
+    pub name: String,
+    pub docstring: Option<Vec<ValidatedContentNode>>,
     pub return_type: Option<Expr>,
     pub args: Arguments,
     pub generics: Vec<TypeParam>,

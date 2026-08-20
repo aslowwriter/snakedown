@@ -7,7 +7,7 @@ use walkdir::WalkDir;
 
 use color_eyre::eyre::{OptionExt, Result, eyre};
 
-use crate::indexing::index::RawIndex;
+use crate::indexing::raw::RawIndex;
 
 /// determines whether given path is a Python module
 /// i.e. a file with a .py extension
