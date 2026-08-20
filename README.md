@@ -47,11 +47,10 @@ Currently, SnakeDown is solidly in the MVP state. As of `v0.2.0` it should be us
     - [x] zola
     - [ ] hugo
 - [x] Logging at appropriate levels
-- [ ] Parse/render docstring formats like numpy and google so we can render them better
 - [x] Configuration file
 - [x] Do reference linking inside the docs
 - [x] Do reference linking to external docs
-- [ ] Benchmarking & optimisation
+- [x] Benchmarking & optimisation
 - [x] Support for pre-executed Jupyter Notebooks
 - [ ] QoL features like:
     - [ ] a file watcher
@@ -64,11 +63,17 @@ Currently, SnakeDown is solidly in the MVP state. As of `v0.2.0` it should be us
 
 ### Why is my Jupyter notebook output not showing up?
 
-The Jupyter format can actually output a surprisng amount of different kinds of output, many of those we didn't have an example case for, and as a general rule we don't implement things we can't verify the use of. However, if you have something that produces output we don't support and are willing to share (a simplified version) so we can make sure it works properly, please open a feature request. The media types that our dependency support are listed [here](https://docs.rs/jupyter-protocol/1.0.0/jupyter_protocol/media/enum.MediaType.html).
+The Jupyter format can actually output a surprising amount of different kinds of output, many of those we didn't have an example case for, and as a general rule we don't implement things we can't verify the use of. However, if you have something that produces output we don't support and are willing to share (a simplified version) so we can make sure it works properly, please open a feature request. The media types that our dependency support are listed [here](https://docs.rs/jupyter-protocol/1.0.0/jupyter_protocol/media/enum.MediaType.html).
 
 ### Can I use whatever theme I like?
 
 Yes. All renderers should have a mode that will generate output without any decorations that out themes will use to style it a certain way so that you can use it in other themes. However, if you do this we cannot guarantee that it will look correct.
+
+### What about `.rst` conversion?
+
+As it is the native language of Sphinx, most python docstrings/documentation is written in ReStructuredText (RST). Sphinx does support markdown through the [MyST](https://myst-parser.readthedocs.io/en/latest/intro.html) extension, which converts the markdown to RST before sphinx uses it. However, most of the target SSGs either primarily or exclusively support markdown, therefore the only way that would make sense to offer RST support in snakedown would be to do the opposite and translate the RST to Markdown. This would be a huge maintenance burden for snakedown. 
+
+Snakedown is means as an alternative Sphinx, not an alternative implementation and thus compatibility with Sphinx is a non-goal. As such, we do not plan to add RST support to snakedown. Users wanting to migrate to snakedown from something that uses RST will have to translate it to markdown themselves. There are tools that can do this, but the user will remain responsible for doing so.
 
 ### Is SnakeDown dead?
 
