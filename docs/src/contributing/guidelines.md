@@ -30,6 +30,14 @@ When in doubt, requesting early feedback is allowed and even encouraged.
 ## Coverage
 Coverage in Rust can be a bit fineky at times, and additionally coverage doesn't always tell the whole story, so we usually don't enforce hard limits on coverage. For example llvm-cov marking a file that only contains a `)?` when returning a `Result` that will (almost) never error is not uncommon. We don't think there's much value in enforcing that these lines be covered, so if you miss those for example, that's okay. That being said, we do like to keep our coverage high, so if you don't cover something, please have good explanation as to why!
 
+## Use of `.unwrap()` et al.
+
+Having good error handling and reporting is very important to snakedown, and as such, use of `.unwrap`, `.expect`, `panic!()` etc, should be avoided whenever possible, so we have lints setup to disallow this.
+
+However, there are times when results are technically possible because of an API, but should never happen because we have verrifed the behaviour at compile. In these cases it is acceptable to use the unwrap and silence the warning with an attribute like `#[allow(clippy::unwrap_used)]` but if you do, please also add a comment explaining why this is always safe to do. In cases where a result might return an `Err` proper error handling should be used.
+
+An example of such a situation is for example if we collect all keys to a hashmap into a separate collection, and then immediately iterateing over those and getting the value mutably from the `HashMap` so we can mutate them without running into problems with the borrow checker. In this case, we can quite easily see that the indexing should always return `Some` even though the API returns an `Option`. In such a situation it is perfectly fine to use `.expect` and allow that instance.
+
 ## Organisation
 
 For code organization, we recommend
