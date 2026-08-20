@@ -4,6 +4,39 @@ All notable changes to this project will be documented in this file.
 
 ## [unreleased]
 
+## [0.4.0](https://github.com/aslowwriter/snakedown/compare/v0.3.0...v0.4.0) - 2026-08-20
+
+### Fixed
+
+- remove regex dependency
+- remove unused struct
+- fix breaking changes introduced in nbformat 3
+- update github handle
+- non existent pandas link in 404 fetch test
+- add linking arg for flamegraph
+- abort on HTTP error when fetching cache
+
+### Other
+
+- add unwrap contrib guideline
+- refactor index validation & render logic
+- *(deps)* bump JamesIves/github-pages-deploy-action
+- refactor content parsing
+- update pixi version and lockfile
+- simplify render_reference return type
+- update dependencies
+- refactor render_docs
+- *(deps)* bump prefix-dev/setup-pixi from 0.10.0 to 0.10.1
+- *(deps)* bump tera from 1.20.1 to 2.1.0
+- add contrib guideines about adding ssgs
+- *(deps)* bump prefix-dev/setup-pixi from 0.9.6 to 0.10.0
+- *(deps)* bump actions/checkout from 6 to 7
+- *(deps)* bump codecov/codecov-action from 6 to 7
+- *(deps)* bump prefix-dev/setup-pixi from 0.9.5 to 0.9.6
+- move to sphinx_inv for inv parsing
+- *(deps)* bump codecov/codecov-action from 5 to 6
+- *(deps)* bump prefix-dev/setup-pixi from 0.9.4 to 0.9.5
+
 ## [0.3.0](https://github.com/aslowwriter/snakedown/compare/v0.2.0...v0.3.0) - 2026-02-08
 
 ### Added
