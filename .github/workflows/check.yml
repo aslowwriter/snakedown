@@ -29,3 +29,24 @@ jobs:
 
       - name: run lints
         run: pixi run lint
+  committed:
+    name: Lint Commits
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+      - name: dump commit messages
+        env:
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          TAG="$(git tag | sort -V -r | head -n 1)"
+          git log "$TAG"..HEAD --format=%B > msg.txt
+
+      - name: Check spelling of commit messages
+        uses: crate-ci/typos@v1.42.1
+        with:
+          files: ./msg.txt
+      - name: Check conventional commits
+        uses: crate-ci/committed@master
