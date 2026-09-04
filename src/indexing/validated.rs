@@ -145,6 +145,7 @@ impl ValidatedIndex {
                                 .collect()
                         }),
                         exports: module.exports.clone(),
+                        source_file: module.source_file.clone(),
                     })
                 }
                 ObjectDocumentation::Class(class) => {
@@ -152,6 +153,9 @@ impl ValidatedIndex {
                         name: class.name.to_string(),
                         docstring: Some(validated_content),
                         method_names: class.methods.iter().map(|f| f.name.clone()).collect(),
+                        first_line: class.first_line,
+                        last_line: class.last_line,
+                        source_file: class.source_file.clone(),
                     })
                 }
                 ObjectDocumentation::Function(function) => {
@@ -161,6 +165,9 @@ impl ValidatedIndex {
                         return_type: function.return_type.clone(),
                         args: function.args.clone(),
                         generics: function.generics.clone(),
+                        first_line: function.first_line,
+                        last_line: function.last_line,
+                        source_file: function.source_file.clone(),
                     })
                 }
             };

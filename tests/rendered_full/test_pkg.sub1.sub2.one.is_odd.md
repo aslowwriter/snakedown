@@ -1,4 +1,5 @@
 # test_pkg.sub1.sub2.one.is_odd
+[source](test_pkg/sub1/sub2/one.py)
 
 is_odd(num: int) -> bool
 

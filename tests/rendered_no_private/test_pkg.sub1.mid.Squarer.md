@@ -1,4 +1,5 @@
 # test_pkg.sub1.mid.Squarer
+[source](test_pkg/sub1/mid.py)
 
 Class to square numbers.
 

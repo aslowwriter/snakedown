@@ -1,4 +1,5 @@
 # test_pkg._private.internals
+[source](test_pkg/_private/internals.py)
 
 internals.py
 

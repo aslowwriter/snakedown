@@ -1,4 +1,5 @@
 # test_pkg.foo._subtract
+[source](test_pkg/foo.py)
 
 _subtract(a: float, b: float) -> float
 

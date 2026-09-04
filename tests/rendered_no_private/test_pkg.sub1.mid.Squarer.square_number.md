@@ -1,4 +1,5 @@
 # test_pkg.sub1.mid.Squarer.square_number
+[source](test_pkg/sub1/mid.py)
 
 square_number(self, x: int) -> int
 

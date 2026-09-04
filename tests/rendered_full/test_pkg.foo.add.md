@@ -1,4 +1,5 @@
 # test_pkg.foo.add
+[source](test_pkg/foo.py)
 
 add(a: float, b: float) -> float
 

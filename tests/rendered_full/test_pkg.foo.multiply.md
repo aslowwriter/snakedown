@@ -1,4 +1,5 @@
 # test_pkg.foo.multiply
+[source](test_pkg/foo.py)
 
 multiply(a: float, b: float) -> float
 

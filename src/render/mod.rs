@@ -91,6 +91,13 @@ pub fn render_module<R: Renderer>(
 
     let front_matter = &renderer.render_front_matter(Some(&fully_qualified_name));
     local_ctx.insert("SNAKEDOWN_FRONT_MATTER", &front_matter);
+    local_ctx.insert(
+        "SNAKEDOWN_LOCATION",
+        &format!(
+            "[source]({})",
+            renderer.render_source_location_link(&mod_doc.source_file, None)
+        ),
+    );
 
     if let Some(docstring_nodes) = mod_doc.docstring.clone() {
         let docstring = docstring_nodes
@@ -108,6 +115,7 @@ pub fn render_module<R: Renderer>(
     }
 
     let function_template = r#"{{ SNAKEDOWN_FRONT_MATTER }}
+{{SNAKEDOWN_LOCATION}}
 {%if SNAKEDOWN_MODULE_DOCSTRING%}
 {{SNAKEDOWN_MODULE_DOCSTRING}}
 {%endif%}"#;
@@ -128,6 +136,19 @@ fn render_class_docs<R: Renderer>(
 
     let front_matter = &renderer.render_front_matter(Some(fully_qualified_name));
     local_ctx.insert("SNAKEDOWN_FRONT_MATTER", &front_matter);
+    local_ctx.insert(
+        "SNAKEDOWN_LOCATION",
+        &format!(
+            "[source]({})",
+            renderer.render_source_location_link(
+                &class_docs.source_file,
+                Some((
+                    class_docs.first_line.to_usize(),
+                    class_docs.last_line.to_usize()
+                ))
+            )
+        ),
+    );
 
     if let Some(docstring_nodes) = class_docs.docstring.clone() {
         let docstring = docstring_nodes
@@ -145,6 +166,7 @@ fn render_class_docs<R: Renderer>(
     }
 
     let function_template = r#"{{ SNAKEDOWN_FRONT_MATTER }}
+{{SNAKEDOWN_LOCATION}}
 {%if SNAKEDOWN_CLASS_DOCSTRING%}
 {{SNAKEDOWN_CLASS_DOCSTRING}}
 {%endif%}"#;
@@ -152,7 +174,8 @@ fn render_class_docs<R: Renderer>(
     // This template is always the same and so should never fail
     // hence the expect is safe
     #[allow(clippy::expect_used)]
-    Tera::one_off(function_template, &local_ctx, false).expect("Failed to render template")
+    Tera::one_off(function_template, &local_ctx, false)
+        .expect("Failed to render template, this is a snakedown bug.")
 }
 
 fn render_function_docs<R: Renderer>(
@@ -166,6 +189,16 @@ fn render_function_docs<R: Renderer>(
     let front_matter = &renderer.render_front_matter(Some(fully_qualified_name));
     local_ctx.insert("SNAKEDOWN_FRONT_MATTER", &front_matter);
     local_ctx.insert("SNAKEDOWN_FUNCTION_NAME", &fn_docs.name);
+    local_ctx.insert(
+        "SNAKEDOWN_LOCATION",
+        &format!(
+            "[source]({})",
+            renderer.render_source_location_link(
+                &fn_docs.source_file,
+                Some((fn_docs.first_line.to_usize(), fn_docs.last_line.to_usize()))
+            )
+        ),
+    );
     local_ctx.insert(
         "SNAKEDOWN_FUNCTION_ARGS",
         &render_args(fn_docs.args.clone()),
@@ -190,6 +223,7 @@ fn render_function_docs<R: Renderer>(
     }
 
     let function_template = r#"{{ SNAKEDOWN_FRONT_MATTER }}
+{{SNAKEDOWN_LOCATION}}
 
 {{ SNAKEDOWN_FUNCTION_NAME }}({{ SNAKEDOWN_FUNCTION_ARGS }}){% if SNAKEDOWN_FUNCTION_RET %} -> {{ SNAKEDOWN_FUNCTION_RET }}{%endif%}
 {%if SNAKEDOWN_FUNCTION_DOCSTRING%}
@@ -221,6 +255,7 @@ mod test {
     };
     use color_eyre::Result;
     use pretty_assertions::assert_eq;
+    use rustpython_parser::source_code::RandomLocator;
     use tera::Context;
 
     fn test_dirty_module_str() -> &'static str {
@@ -277,6 +312,7 @@ class Greeter:
 
     fn expected_module_docs_rendered() -> &'static str {
         r#"# snakedown.testing.test_module
+[source](foo)
 
 This is a module that is used to test snakedown.
 "#
@@ -284,8 +320,11 @@ This is a module that is used to test snakedown.
 
     #[test]
     fn render_module_documentation() -> Result<()> {
-        let parsed = parse_python_str(test_dirty_module_str())?;
-        let mod_documentation = extract_module_documentation(&parsed, false, false);
+        let content = test_dirty_module_str();
+        let parsed = parse_python_str(content)?;
+        let mut locator = RandomLocator::new(content);
+        let mod_documentation =
+            extract_module_documentation(&parsed, false, false, &mut locator, PathBuf::from("foo"));
         let ctx = Context::new();
 
         let validated_mod_documentation = ValidatedModuleDocumentation {
@@ -311,6 +350,7 @@ This is a module that is used to test snakedown.
                 .sub_modules
                 .map(|v| v.iter().map(|p| p.display().to_string()).collect()),
             exports: mod_documentation.exports,
+            source_file: PathBuf::from("foo"),
         };
 
         let rendered = render_module(
@@ -329,6 +369,7 @@ This is a module that is used to test snakedown.
         r#"+++
 title = "snakedown"
 +++
+[source](foo)
 
 This is a module that is used to test snakedown.
 "#
@@ -336,8 +377,11 @@ This is a module that is used to test snakedown.
 
     #[test]
     fn render_module_documentation_zola() -> Result<()> {
-        let parsed = parse_python_str(test_dirty_module_str())?;
-        let mod_documentation = extract_module_documentation(&parsed, false, false);
+        let content = test_dirty_module_str();
+        let parsed = parse_python_str(content)?;
+        let mut locator = RandomLocator::new(content);
+        let mod_documentation =
+            extract_module_documentation(&parsed, false, false, &mut locator, PathBuf::from("foo"));
         let ctx = Context::new();
 
         let validated_mod_documentation = ValidatedModuleDocumentation {
@@ -363,6 +407,7 @@ This is a module that is used to test snakedown.
                 .sub_modules
                 .map(|v| v.iter().map(|p| p.display().to_string()).collect()),
             exports: mod_documentation.exports,
+            source_file: PathBuf::from("foo"),
         };
         let rendered = render_module(
             &validated_mod_documentation,

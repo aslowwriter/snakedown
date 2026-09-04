@@ -1,4 +1,5 @@
 # test_pkg.bar
+[source](test_pkg/bar.py)
 
 bar.py
 

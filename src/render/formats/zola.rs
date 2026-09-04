@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use url::Url;
 
@@ -47,6 +47,19 @@ impl Renderer for ZolaRenderer {
         let index_front_matter = self.render_front_matter(title.as_deref());
 
         Some((PathBuf::from("_index.md"), index_front_matter))
+    }
+
+    fn render_source_location_link(
+        &self,
+        source_file: &Path,
+        range: Option<(usize, usize)>,
+    ) -> String {
+        match range {
+            Some((first_line, last_line)) => {
+                format!("{}#L{}-L{}", source_file.display(), first_line, last_line)
+            }
+            None => format!("{}", source_file.display()),
+        }
     }
 }
 

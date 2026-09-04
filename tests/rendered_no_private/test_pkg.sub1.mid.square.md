@@ -1,4 +1,5 @@
 # test_pkg.sub1.mid.square
+[source](test_pkg/sub1/mid.py)
 
 square(x: int) -> int
 

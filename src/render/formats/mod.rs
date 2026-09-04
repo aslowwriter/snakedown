@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub mod md;
 pub mod zola;
@@ -6,6 +6,11 @@ pub mod zola;
 pub trait Renderer {
     fn render_header(&self, content: &str, level: usize) -> String;
     fn render_front_matter(&self, title: Option<&str>) -> String;
+    fn render_source_location_link(
+        &self,
+        source_file: &Path,
+        range: Option<(usize, usize)>,
+    ) -> String;
     fn render_reference(&self, target: String, display_text: String) -> String;
 
     // This is on the Renderer because it is ssg specific.
@@ -34,6 +39,14 @@ impl<T: Renderer + ?Sized> Renderer for &T {
     fn index_file(&self, title: Option<String>) -> Option<(PathBuf, String)> {
         (**self).index_file(title)
     }
+
+    fn render_source_location_link(
+        &self,
+        source_file: &Path,
+        range: Option<(usize, usize)>,
+    ) -> String {
+        (**self).render_source_location_link(source_file, range)
+    }
 }
 
 impl Renderer for Box<dyn Renderer> {
@@ -48,6 +61,13 @@ impl Renderer for Box<dyn Renderer> {
     }
     fn content_path(&self) -> Option<PathBuf> {
         (**self).content_path()
+    }
+    fn render_source_location_link(
+        &self,
+        source_file: &Path,
+        range: Option<(usize, usize)>,
+    ) -> String {
+        (**self).render_source_location_link(source_file, range)
     }
     fn index_file(&self, title: Option<String>) -> Option<(PathBuf, String)> {
         (**self).index_file(title)

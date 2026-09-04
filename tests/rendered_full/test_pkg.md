@@ -1,4 +1,5 @@
 # test_pkg
+[source](test_pkg/__init__.py)
 
 Root package initialization.
 

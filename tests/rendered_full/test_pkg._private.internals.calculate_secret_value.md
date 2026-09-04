@@ -1,4 +1,5 @@
 # test_pkg._private.internals.calculate_secret_value
+[source](test_pkg/_private/internals.py)
 
 calculate_secret_value(x: int, y: int) -> int
 

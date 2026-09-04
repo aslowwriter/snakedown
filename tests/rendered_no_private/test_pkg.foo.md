@@ -1,4 +1,5 @@
 # test_pkg.foo
+[source](test_pkg/foo.py)
 
 foo.py
 

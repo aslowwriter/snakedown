@@ -25,8 +25,7 @@ fn test_skip_write_does_not_write() -> Result<()> {
         .arg("test_pkg/excluded_file.py")
         .arg("--exclude")
         .arg("test_pkg/excluded_module")
-        .arg("--skip-write")
-        .arg("-vvv");
+        .arg("--skip-write");
     let assertion = cmd.assert();
 
     assertion.success();
@@ -53,8 +52,7 @@ fn test_cli_with_all_options() -> Result<()> {
         .arg("-e")
         .arg("test_pkg/excluded_file.py")
         .arg("--exclude")
-        .arg("test_pkg/excluded_module")
-        .arg("-vv");
+        .arg("test_pkg/excluded_module");
     let assertion = cmd.assert();
 
     assertion.success();
@@ -86,8 +84,7 @@ fn test_cli_with_zola() -> Result<()> {
         .arg("--exclude")
         .arg("test_pkg/excluded_module")
         .arg("--ssg")
-        .arg("zola")
-        .arg("-vv");
+        .arg("zola");
     let snakedown_assertion = cmd.assert();
 
     snakedown_assertion.success();

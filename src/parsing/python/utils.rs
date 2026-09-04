@@ -7,21 +7,12 @@ use rustpython_parser::{
     ast::{Constant, Expr, ExprConstant, Mod, Stmt, StmtExpr},
     parse,
 };
-use std::{fs::File, io::Read, path::Path};
 
 use crate::indexing::content::{ContentNode, parse_contents};
 
-pub fn parse_python_file(path: &Path) -> Result<Mod> {
-    let mut file = File::open(path)?;
-    let mut file_content = String::new();
-    file.read_to_string(&mut file_content)?;
-    let program = parse_python_str(&file_content)?;
-    Ok(program)
-}
-
 pub fn parse_python_str(content: &str) -> Result<Mod> {
-    let parsed = parse(content, Mode::Module, "<embedded>");
-    Ok(parsed?)
+    let parsed = parse(content, Mode::Module, "<embedded>")?;
+    Ok(parsed)
 }
 
 pub(crate) fn extract_docstring_from_body(
@@ -83,14 +74,25 @@ pub(crate) fn extract_docstring_from_body(
 #[cfg(test)]
 mod test {
 
+    use rustpython_parser::source_code::RandomLocator;
+    use std::path::PathBuf;
+
     use crate::parsing::python::module::extract_module_documentation;
 
     use super::*;
 
     #[test]
     fn parse_empty_string() -> Result<()> {
-        let program = parse_python_str("")?;
-        let documentation = extract_module_documentation(&program, false, false);
+        let content = "";
+        let program = parse_python_str(content)?;
+        let mut locator = RandomLocator::new(content);
+        let documentation = extract_module_documentation(
+            &program,
+            false,
+            false,
+            &mut locator,
+            PathBuf::from("foo"),
+        );
 
         assert_eq!(documentation.docstring, None);
         assert_eq!(documentation.functions.len(), 0);

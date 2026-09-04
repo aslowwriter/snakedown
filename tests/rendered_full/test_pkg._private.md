@@ -1,4 +1,5 @@
 # test_pkg._private
+[source](test_pkg/_private/__init__.py)
 
 The _private subpackage
 

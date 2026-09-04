@@ -1,4 +1,5 @@
 # test_pkg._private.internals._double_value
+[source](test_pkg/_private/internals.py)
 
 _double_value(value: int) -> int
 

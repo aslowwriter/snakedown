@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use url::Url;
 
@@ -39,6 +39,14 @@ impl Renderer for MdRenderer {
 
     fn index_file(&self, _title: Option<String>) -> Option<(PathBuf, String)> {
         None
+    }
+
+    fn render_source_location_link(
+        &self,
+        source_file: &Path,
+        _range: Option<(usize, usize)>,
+    ) -> String {
+        source_file.display().to_string()
     }
 }
 

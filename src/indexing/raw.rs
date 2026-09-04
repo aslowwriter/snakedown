@@ -1,3 +1,4 @@
+use crate::parsing::python::utils::parse_python_str;
 use crate::{
     config::ExternalIndex,
     indexing::validated::{InvalidReference, ValidatedIndex},
@@ -8,7 +9,6 @@ use crate::{
             function::FunctionDocumentation,
             jupyter::parse_notebook_file,
             module::{ModuleDocumentation, extract_module_documentation},
-            utils::parse_python_file,
         },
     },
     should_include_reference,
@@ -16,11 +16,10 @@ use crate::{
 use color_eyre::{Result, eyre::eyre};
 use edit_distance::edit_distance;
 use nbformat::v4::Cell;
+use rustpython_parser::source_code::RandomLocator;
 use sphinx_inv::SphinxInventoryReader;
-use std::{
-    collections::HashMap,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashMap, path::PathBuf};
+use std::{fs::File, io::Read, path::Path};
 use tracing::{info, warn};
 use url::Url;
 
@@ -56,7 +55,11 @@ impl RawIndex {
     pub fn index_file(&mut self, path: PathBuf) -> Result<()> {
         tracing::info!("Indexing {}", &path.display());
 
-        let parsed = parse_python_file(&path);
+        let mut file = File::open(&path)?;
+        let mut file_content = String::new();
+        file.read_to_string(&mut file_content)?;
+        let parsed = parse_python_str(&file_content);
+        let mut locator = RandomLocator::new(&file_content);
 
         let rel_module_file_path = path.clone().strip_prefix(&self.pkg_root)?.to_path_buf();
         let module_import_path: String = {
@@ -70,8 +73,13 @@ impl RawIndex {
 
         match parsed {
             Ok(contents) => {
-                let mod_docs =
-                    extract_module_documentation(&contents, self.skip_private, self.skip_undoc);
+                let mod_docs = extract_module_documentation(
+                    &contents,
+                    self.skip_private,
+                    self.skip_undoc,
+                    &mut locator,
+                    PathBuf::from(self.pkg_name.clone()).join(rel_module_file_path),
+                );
                 if should_include_module(&mod_docs, self.skip_undoc) {
                     self.internal_object_store.insert(
                         module_import_path.clone(),

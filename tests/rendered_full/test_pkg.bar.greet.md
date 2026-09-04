@@ -1,4 +1,5 @@
 # test_pkg.bar.greet
+[source](test_pkg/bar.py)
 
 greet(name: str) -> str
 
