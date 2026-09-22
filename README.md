@@ -1,11 +1,16 @@
 # SnakeDown 🐍🕵️‍♂️
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![codecov](https://codecov.io/gh/aslowwriter/SnakeDown/branch/main/graph/badge.svg)](https://codecov.io/gh/aslowwriter/SnakeDown)
-[![crates.io](https://img.shields.io/crates/v/snakedown)](https://crates.io/crates/snakedown)
-[![Docs.rs](https://docs.rs/snakedown/badge.svg)](https://docs.rs/snakedown)
-[![Pixi Badge](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/prefix-dev/pixi/main/assets/badge/v0.json)](https://pixi.sh)
 
+All developments of this project have been moved to codeberg [here](https://codeberg.org/ASlowWriter/snakedown).
+
+This decision made based on the following reasons:
+1. Github has become significantly worse to use over the years, in perticular one of the most important features, the review tab and review comments have beomce more and more unusable over time
+2. AI is being shoved in more places than I can shake a stick at despite all it doing is creating more busy work and I'm sick of it. I do not fear "being left behind" 
+3. AI makes a mockery of copyright, software lisences and the spirit of open source software even at the laughably weak state that all of those have been for the past few decades
+4. AI is the biggest environmental disaster since the internal combustion engine. 
+5. Microsoft as a well and storied history of using [Embrace, extend, and extinguish](https://en.wikipedia.org/wiki/Embrace,_extend,_and_extinguish) (a term they invented) to segment functional monopolies wherever possible 
+
+ This repository only remains as a public archive of the code at time of migration.
 
 A Python API extractor written in Rust, with the goal of allowing you to host python documentation with your favourite static site generator.
 
